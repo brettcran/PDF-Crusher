@@ -6,17 +6,13 @@
   <title>PDF Fill & Sign Pro</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="icon-192.png">
   <meta name="theme-color" content="#4f46e5">
 </head>
 <body>
 
-<!-- Install Banner -->
-<div id="install-banner">📲 Install PDF Fill & Sign App</div>
-
-<!-- Toolbar -->
-<div id="toolbar">
-  <input type="file" id="file-input" accept="application/pdf">
+<header id="toolbar">
+  <button class="upload-btn">📄 Upload PDF</button>
+  <input type="file" id="file-input" accept="application/pdf" style="display:none;">
   <button id="text-tool-btn">📝 Add Text</button>
   <select id="font-size-select">
     <option value="12">12px</option>
@@ -33,18 +29,20 @@
   <button id="zoom-in-btn">➕ Zoom In</button>
   <button id="zoom-out-btn">➖ Zoom Out</button>
   <button id="prev-page">⬅️ Prev</button>
-  <span id="page-info">Page 1</span>
+  <span id="page-info" style="display:none;">Page 1</span>
   <button id="next-page">➡️ Next</button>
-  <button id="save-pdf-btn">💾 Save PDF</button>
+</header>
+
+<main id="pdf-container"></main>
+
+<div class="save-btn-container">
+  <button id="save-pdf-btn" class="hero-save-btn">💾 Save PDF</button>
 </div>
 
-<!-- PDF Display -->
-<div id="pdf-container"></div>
-
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 <script src="app.js"></script>
-<script>
-  if ('
+
+</body>
+</html>
