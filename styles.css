@@ -1,3 +1,5 @@
+/* Luxury SaaS Final styles.css */
+
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', sans-serif;
@@ -40,7 +42,7 @@ body {
   box-shadow: 0 6px 12px rgba(99,102,241,0.5);
 }
 
-/* Updated PDF container for vertical scrolling */
+/* Vertical PDF Container */
 #pdf-container {
   display: flex;
   flex-direction: column;
@@ -52,7 +54,7 @@ body {
   overflow-y: auto;
 }
 
-/* Canvas Styling */
+/* Canvas */
 canvas {
   background: white;
   border-radius: 20px;
@@ -84,10 +86,10 @@ canvas {
   }
 }
 
-/* Draggable Text Box */
+/* Draggable Editable Text Box */
 .text-box {
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+  background: transparent; /* Full transparent background */
   border: 2px dashed #6366f1;
   border-radius: 12px;
   padding: 8px 12px;
@@ -97,18 +99,19 @@ canvas {
   cursor: move;
   user-select: none;
   overflow: hidden;
+  color: #111827; /* readable dark text */
 }
 
 .text-box:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.95);
   border: 2px solid #4f46e5;
 }
 
-/* Uploaded Signature */
+/* Uploaded Signature Image */
 .signature-image {
   width: 100px;
   height: auto;
   pointer-events: none;
   object-fit: contain;
+  position: absolute;
 }
