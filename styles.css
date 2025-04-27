@@ -1,4 +1,4 @@
-/* === Luxury SaaS Final styles.css === */
+/* === Final Luxury styles.css === */
 
 body {
   margin: 0;
@@ -42,7 +42,7 @@ body {
   box-shadow: 0 6px 12px rgba(99,102,241,0.5);
 }
 
-/* PDF Container and Layers */
+/* PDF Container */
 #pdf-container {
   position: relative;
   display: flex;
@@ -56,6 +56,8 @@ body {
 }
 
 #pdf-viewer canvas {
+  display: block;
+  margin: 0 auto;
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -68,10 +70,10 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* allow touch gestures through unless editing */
+  pointer-events: none;
 }
 
-/* Mobile Floating Toolbar */
+/* Mobile Toolbar */
 #mobile-toolbar {
   display: none;
 }
@@ -96,7 +98,7 @@ body {
   }
 }
 
-/* Text Box Styling */
+/* Text Boxes */
 .text-box {
   position: absolute;
   background: transparent;
@@ -106,11 +108,10 @@ body {
   min-width: 60px;
   min-height: 24px;
   font-size: 16px;
-  cursor: move;
-  user-select: none;
-  overflow: auto;
   color: #111827;
   resize: both;
+  overflow: auto;
+  cursor: move;
   pointer-events: auto;
 }
 
@@ -119,18 +120,22 @@ body {
   border: none;
 }
 
-/* Signature Styling */
+.text-box:focus {
+  outline: none;
+}
+
+/* Signature Images */
 .signature-image {
   position: absolute;
   width: 100px;
   height: auto;
-  pointer-events: auto;
   object-fit: contain;
   resize: both;
   overflow: auto;
+  pointer-events: auto;
 }
 
-/* Signature Modal */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
