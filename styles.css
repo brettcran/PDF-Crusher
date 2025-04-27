@@ -3,9 +3,25 @@
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', sans-serif;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  background: linear-gradient(135deg, #c7d2fe, #6366f1);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* Fade-in Animation */
+.fade-in {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Landing Header */
