@@ -1,9 +1,7 @@
 // === app.js (Luxury + Working PDF Load) ===
 
-// Configure pdf.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-// Variables
 let pdfDoc = null;
 let pageNum = 1;
 let pageRendering = false;
@@ -12,10 +10,8 @@ let scale = 1.5;
 let canvas = document.createElement('canvas');
 let ctx = canvas.getContext('2d');
 
-// Add the canvas inside pdf-container
 document.getElementById('pdf-container').appendChild(canvas);
 
-// Render page function
 function renderPage(num) {
   pageRendering = true;
 
@@ -39,12 +35,10 @@ function renderPage(num) {
     });
   });
 
-  // Update page info
   document.getElementById('page-info').style.display = 'inline-block';
   document.getElementById('page-info').textContent = `Page ${num}`;
 }
 
-// Queue render
 function queueRenderPage(num) {
   if (pageRendering) {
     pageNumPending = num;
@@ -53,25 +47,18 @@ function queueRenderPage(num) {
   }
 }
 
-// Show previous page
 document.getElementById('prev-page').addEventListener('click', function() {
-  if (pageNum <= 1) {
-    return;
-  }
+  if (pageNum <= 1) return;
   pageNum--;
   queueRenderPage(pageNum);
 });
 
-// Show next page
 document.getElementById('next-page').addEventListener('click', function() {
-  if (pageNum >= pdfDoc.numPages) {
-    return;
-  }
+  if (pageNum >= pdfDoc.numPages) return;
   pageNum++;
   queueRenderPage(pageNum);
 });
 
-// Load PDF
 function loadPDF(file) {
   const fileReader = new FileReader();
   fileReader.onload = function() {
@@ -86,12 +73,10 @@ function loadPDF(file) {
   fileReader.readAsArrayBuffer(file);
 }
 
-// Upload Button trigger
 document.querySelector('.upload-btn').addEventListener('click', function() {
   document.getElementById('file-input').click();
 });
 
-// File Input change event
 document.getElementById('file-input').addEventListener('change', function(e) {
   if (e.target.files.length > 0) {
     loadPDF(e.target.files[0]);
