@@ -1,7 +1,4 @@
-// === FINAL app.js (Landing + Editor Smart) ===
-
-// Setup PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+// === FINAL FIXED app.js (Landing + Editor Smart) ===
 
 let pdfDoc = null;
 let scale = 1.5;
@@ -12,6 +9,11 @@ let lastClick = { x: 150, y: 200 };
 
 // Detect page
 const isLandingPage = document.getElementById('landing-main') !== null;
+
+// Only setup PDF.js if NOT Landing page
+if (!isLandingPage) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+}
 
 // === Landing Page Logic ===
 if (isLandingPage) {
@@ -67,11 +69,7 @@ if (!isLandingPage) {
     lastClick.y = e.clientY - rect.top + document.getElementById('pdf-container').scrollTop;
   });
 
-  // Load recent file if exists
   const currentFile = localStorage.getItem('currentFile');
-  if (currentFile) {
-    // Wait for user upload for security reasons
-  }
 }
 
 // === Common Functions ===
@@ -117,7 +115,7 @@ function loadPDF(file) {
 function updateRecentFiles(name) {
   let recent = JSON.parse(localStorage.getItem('recentFiles') || '[]');
   recent.unshift(name);
-  recent = [...new Set(recent)]; // Remove duplicates
+  recent = [...new Set(recent)];
   if (recent.length > 5) recent = recent.slice(0,5);
   localStorage.setItem('recentFiles', JSON.stringify(recent));
 }
@@ -170,37 +168,6 @@ function handleButtonClick(action) {
   }
 }
 
-// === Save PDF Cleanly
-function savePDF() {
-  document.querySelectorAll('.text-box').forEach(el => el.classList.add('saving'));
-
-  html2canvas(document.getElementById('pdf-container'), { scale: 2 }).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'px' });
-
-    const viewer = document.getElementById('pdf-viewer');
-    const pageCanvases = viewer.querySelectorAll('canvas');
-
-    pageCanvases.forEach((pageCanvas, index) => {
-      const imgDataPage = pageCanvas.toDataURL('image/png');
-      const imgProps = pdf.getImageProperties(imgDataPage);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      if (index > 0) pdf.addPage();
-      pdf.addImage(imgDataPage, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    });
-
-    pdf.save(`${uploadedFileName}-filled.pdf`);
-
-    document.querySelectorAll('.text-box').forEach(el => el.classList.remove('saving'));
-
-    setTimeout(() => {
-      window.location.href = 'index.html'; // Return to landing page
-    }, 500);
-  });
-}
-
 // === Add Text
 function createTextBox() {
   const textBox = document.createElement('div');
@@ -214,9 +181,8 @@ function createTextBox() {
   document.getElementById('user-layer').appendChild(textBox);
   elements.push(textBox);
 
-  textBox.focus(); // Force keyboard open on mobile
+  textBox.focus();
   textBox.addEventListener('touchstart', () => textBox.focus());
 }
 
-// === Signature Modal and Signature functions (already built in previous)
-
+// === Signature Modal functions — handled elsewhere
