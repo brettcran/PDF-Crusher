@@ -1,4 +1,4 @@
-// === FINAL Luxury app.js ===
+// === FINAL Patched app.js ===
 
 // Setup PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
@@ -52,8 +52,12 @@ function loadPDF(file) {
   reader.onload = function() {
     const typedarray = new Uint8Array(this.result);
 
-    // 🛠 Adjust scale depending on device
-    scale = window.innerWidth <= 768 ? 1.0 : 1.5;
+    // 🛠 Dynamic scale for mobile vs desktop
+    if (window.innerWidth <= 768) {
+      scale = Math.min(1.0, window.innerWidth / 800); // mobile dynamic
+    } else {
+      scale = 1.5; // desktop
+    }
 
     pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
@@ -74,7 +78,6 @@ function savePDF() {
     const viewer = document.getElementById('pdf-viewer');
     const pageCanvases = viewer.querySelectorAll('canvas');
 
-    let yOffset = 0;
     pageCanvases.forEach((pageCanvas, index) => {
       const imgDataPage = pageCanvas.toDataURL('image/png');
       const imgProps = pdf.getImageProperties(imgDataPage);
@@ -163,6 +166,7 @@ function enableDragResize(el) {
 
   el.addEventListener('mousedown', (e) => {
     if (e.target !== el) return;
+    e.preventDefault(); // Critical to prevent image drag glitches
     offsetX = e.clientX - el.getBoundingClientRect().left;
     offsetY = e.clientY - el.getBoundingClientRect().top;
 
