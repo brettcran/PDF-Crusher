@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Fill & Sign Pro</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="icon-192.png">
+  <meta name="theme-color" content="#4f46e5">
+</head>
+<body>
+
+<!-- Install Banner -->
+<div id="install-banner">📲 Install PDF Fill & Sign App</div>
+
+<!-- Toolbar -->
+<div id="toolbar">
+  <input type="file" id="file-input" accept="application/pdf">
+  <button id="text-tool-btn">📝 Add Text</button>
+  <select id="font-size-select">
+    <option value="12">12px</option>
+    <option value="14">14px</option>
+    <option value="16" selected>16px</option>
+    <option value="18">18px</option>
+    <option value="24">24px</option>
+    <option value="32">32px</option>
+  </select>
+  <input type="color" id="color-picker" value="#000000">
+  <button id="signature-tool-btn">✍️ Add Signature</button>
+  <button id="undo-btn">↩️ Undo</button>
+  <button id="redo-btn">↪️ Redo</button>
+  <button id="zoom-in-btn">➕ Zoom In</button>
+  <button id="zoom-out-btn">➖ Zoom Out</button>
+  <button id="prev-page">⬅️ Prev</button>
+  <span id="page-info">Page 1</span>
+  <button id="next-page">➡️ Next</button>
+  <button id="save-pdf-btn">💾 Save PDF</button>
+</div>
+
+<!-- PDF Display -->
+<div id="pdf-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('
