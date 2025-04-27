@@ -1,4 +1,4 @@
-// === FINAL app.js (Luxury Build) ===
+// === FINAL Luxury app.js ===
 
 // Setup PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
@@ -18,17 +18,17 @@ const signatureModal = document.getElementById('signature-modal');
 const signatureCanvas = document.getElementById('signature-pad');
 const sigCtx = signatureCanvas.getContext('2d');
 
-// === Click/Tap capture for placement ===
+// === Capture last Click / Tap
 document.getElementById('pdf-container').addEventListener('click', (e) => {
   const rect = e.currentTarget.getBoundingClientRect();
   lastClick.x = e.clientX - rect.left + document.getElementById('pdf-container').scrollLeft;
   lastClick.y = e.clientY - rect.top + document.getElementById('pdf-container').scrollTop;
 });
 
-// === Render PDF Pages Vertically ===
+// === Render PDF Pages Vertically
 function renderAllPages() {
   const viewer = document.getElementById('pdf-viewer');
-  viewer.innerHTML = ''; // Clear old
+  viewer.innerHTML = '';
 
   for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
     pdfDoc.getPage(pageNum).then(function(page) {
@@ -45,12 +45,15 @@ function renderAllPages() {
   }
 }
 
-// === Load PDF ===
+// === Load PDF
 function loadPDF(file) {
   uploadedFileName = file.name.replace(/\.[^/.]+$/, "");
   const reader = new FileReader();
   reader.onload = function() {
     const typedarray = new Uint8Array(this.result);
+
+    // 🛠 Adjust scale depending on device
+    scale = window.innerWidth <= 768 ? 1.0 : 1.5;
 
     pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
@@ -60,24 +63,35 @@ function loadPDF(file) {
   reader.readAsArrayBuffer(file);
 }
 
-// === Save PDF ===
+// === Save PDF Cleanly
 function savePDF() {
   document.querySelectorAll('.text-box').forEach(el => el.classList.add('saving'));
 
   html2canvas(document.getElementById('pdf-container'), { scale: 2 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
-    const pdf = new jspdf.jsPDF();
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    const pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'px' });
+
+    const viewer = document.getElementById('pdf-viewer');
+    const pageCanvases = viewer.querySelectorAll('canvas');
+
+    let yOffset = 0;
+    pageCanvases.forEach((pageCanvas, index) => {
+      const imgDataPage = pageCanvas.toDataURL('image/png');
+      const imgProps = pdf.getImageProperties(imgDataPage);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      if (index > 0) pdf.addPage();
+      pdf.addImage(imgDataPage, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    });
+
     pdf.save(`${uploadedFileName}-filled.pdf`);
 
     document.querySelectorAll('.text-box').forEach(el => el.classList.remove('saving'));
   });
 }
 
-// === Toolbar Button Actions ===
+// === Toolbar Button Actions
 function handleButtonClick(action) {
   switch (action) {
     case 'Upload PDF':
@@ -122,7 +136,7 @@ document.getElementById('file-input').addEventListener('change', (e) => {
   }
 });
 
-// === Create Text Box ===
+// === Create Text Box
 function createTextBox() {
   const textBox = document.createElement('div');
   textBox.className = 'text-box inactive';
@@ -139,7 +153,7 @@ function createTextBox() {
   textBox.addEventListener('blur', () => textBox.classList.add('inactive'));
 }
 
-// === Enable Drag and Resize ===
+// === Enable Drag and Resize
 function enableDragResize(el) {
   el.style.position = 'absolute';
   el.style.resize = 'both';
@@ -167,7 +181,7 @@ function enableDragResize(el) {
   });
 }
 
-// === Signature Modal ===
+// === Signature Modal
 function openSignatureModal() {
   signatureModal.style.display = 'block';
   loadSavedSignatures();
@@ -195,7 +209,6 @@ document.getElementById('clear-signature').onclick = () => {
   sigCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
 };
 
-// Save Signature to LocalStorage
 document.getElementById('save-signature').onclick = () => {
   const dataURL = signatureCanvas.toDataURL();
   saveSignature(dataURL);
@@ -203,7 +216,6 @@ document.getElementById('save-signature').onclick = () => {
   placeSignature(dataURL);
 };
 
-// Upload Signature
 document.getElementById('upload-signature').onchange = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -227,7 +239,7 @@ function placeSignature(src) {
   elements.push(img);
 }
 
-// === LocalStorage Signatures ===
+// === LocalStorage Signatures
 function saveSignature(dataURL) {
   let saved = JSON.parse(localStorage.getItem('signatures') || "[]");
   saved.unshift(dataURL);
@@ -250,7 +262,7 @@ function loadSavedSignatures() {
   });
 }
 
-// === Undo / Redo ===
+// === Undo / Redo
 function undo() {
   if (elements.length > 0) {
     const el = elements.pop();
