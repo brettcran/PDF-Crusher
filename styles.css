@@ -1,9 +1,9 @@
-/* === Luxury SaaS Unified styles.css === */
+/* === Luxury SaaS styles.css === */
 
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', sans-serif;
-  background: linear-gradient(135deg, #c7d2fe, #6366f1);
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -24,74 +24,6 @@ body {
   }
 }
 
-/* Landing Header */
-#landing-header {
-  text-align: center;
-  padding: 80px 20px 40px 20px;
-}
-
-#landing-header h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
-  color: #4f46e5;
-}
-
-#landing-header p {
-  font-size: 18px;
-  color: #6b7280;
-}
-
-#landing-actions {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-/* Main Recent Files Section */
-#landing-main {
-  padding: 40px;
-  text-align: center;
-}
-
-#recent-list {
-  list-style: none;
-  padding: 0;
-}
-
-#recent-list li {
-  margin: 10px 0;
-  font-size: 16px;
-  color: #374151;
-}
-
-/* Buttons */
-.primary-btn, .secondary-btn {
-  padding: 14px 30px;
-  font-size: 16px;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.primary-btn {
-  background: linear-gradient(145deg, #4f46e5, #6366f1);
-  color: white;
-}
-
-.secondary-btn {
-  background: white;
-  color: #4f46e5;
-  border: 2px solid #4f46e5;
-}
-
-.primary-btn:hover, .secondary-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(99,102,241,0.3);
-}
-
 /* Toolbar */
 #toolbar {
   display: flex;
@@ -101,12 +33,31 @@ body {
   justify-content: center;
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
   overflow-x: auto;
+}
+
+/* Toolbar Buttons */
+.toolbar-btn {
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
+  border: none;
+  border-radius: 9999px;
+  padding: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .toolbar-btn img {
   width: 28px;
   height: 28px;
+}
+
+.toolbar-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(99,102,241,0.3);
 }
 
 /* PDF Container */
@@ -119,12 +70,45 @@ body {
 }
 
 #pdf-viewer canvas {
-  margin-bottom: 30px;
+  margin: 20px 0;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   border-radius: 16px;
+  max-width: 100%;
 }
 
-/* Help Modal */
+/* Textboxes + Signatures */
+.text-box, .signature-wrapper {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  border: 2px dashed #6366f1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  cursor: move;
+  user-select: none;
+  padding: 8px;
+  min-width: 60px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.text-box[contenteditable="true"]:focus {
+  outline: none;
+  border: 2px solid #4f46e5;
+  background: rgba(255,255,255,0.95);
+}
+
+.signature-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Modal Windows */
 .modal {
   display: none;
   position: fixed;
@@ -133,8 +117,8 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
   background: rgba(0,0,0,0.4);
+  overflow: auto;
 }
 
 .modal-content {
@@ -168,18 +152,13 @@ body {
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
-  #landing-header h1 {
-    font-size: 28px;
-  }
-  #landing-header p {
-    font-size: 16px;
-  }
-  .primary-btn, .secondary-btn {
-    padding: 12px 24px;
-    font-size: 15px;
-  }
   #toolbar {
     padding: 8px;
     gap: 10px;
+  }
+
+  .toolbar-btn img {
+    width: 24px;
+    height: 24px;
   }
 }
