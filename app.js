@@ -4,84 +4,56 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
 let pdfDoc = null;
-let pageNum = 1;
-let pageRendering = false;
-let pageNumPending = null;
 let scale = 1.5;
-let canvas = document.createElement('canvas');
-let ctx = canvas.getContext('2d');
 let uploadedFileName = "filled-pdf"; // Default fallback
+let elements = []; // Text boxes and signatures for undo/redo
+let undoStack = [];
 
-document.getElementById('pdf-container').appendChild(canvas);
-
-// Enable pinch zoom (allow touch gestures)
 document.getElementById('pdf-container').style.touchAction = "manipulation";
 
-// Render a page
-function renderPage(num) {
-  pageRendering = true;
-  pdfDoc.getPage(num).then(function(page) {
-    const viewport = page.getViewport({ scale });
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+// Render all pages vertically
+function renderAllPages() {
+  document.getElementById('pdf-container').innerHTML = ''; // Clear old
+  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+    pdfDoc.getPage(pageNum).then(function(page) {
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
-    };
-    const renderTask = page.render(renderContext);
+      page.render({ canvasContext: ctx, viewport: viewport });
 
-    renderTask.promise.then(function() {
-      pageRendering = false;
-      if (pageNumPending !== null) {
-        renderPage(pageNumPending);
-        pageNumPending = null;
-      }
+      document.getElementById('pdf-container').appendChild(canvas);
     });
-  });
-
-  document.getElementById('page-info').style.display = 'inline-block';
-  document.getElementById('page-info').textContent = `Page ${num}`;
-}
-
-// Queue rendering
-function queueRenderPage(num) {
-  if (pageRendering) {
-    pageNumPending = num;
-  } else {
-    renderPage(num);
   }
 }
 
-// Load uploaded PDF
+// Load PDF
 function loadPDF(file) {
-  uploadedFileName = file.name.replace(/\.[^/.]+$/, ""); // Remove .pdf extension
+  uploadedFileName = file.name.replace(/\.[^/.]+$/, ""); // Remove .pdf
   const reader = new FileReader();
   reader.onload = function() {
     const typedarray = new Uint8Array(this.result);
 
     pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
-      pageNum = 1;
-      renderPage(pageNum);
+      renderAllPages();
     });
   };
   reader.readAsArrayBuffer(file);
 }
 
-// Save PDF as image
+// Save PDF
 function savePDF() {
-  const tempScale = 1.5; // Reset scale for export
-  const originalTransform = canvas.style.transform;
-  canvas.style.transform = '';
-
-  html2canvas(document.getElementById('pdf-container'), { scale: tempScale }).then(canvas => {
+  html2canvas(document.getElementById('pdf-container'), { scale: 2 }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jspdf.jsPDF();
-    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     pdf.save(`${uploadedFileName}-filled.pdf`);
-    // Restore any transforms
-    canvas.style.transform = originalTransform;
   });
 }
 
@@ -101,35 +73,23 @@ function handleButtonClick(action) {
       uploadSignature();
       break;
     case 'Undo':
-      alert('Undo clicked (undo feature coming soon)');
+      undo();
       break;
     case 'Redo':
-      alert('Redo clicked (redo feature coming soon)');
+      redo();
       break;
     case 'Zoom In':
       scale = Math.min(scale + 0.25, 3.0);
-      queueRenderPage(pageNum);
+      renderAllPages();
       break;
     case 'Zoom Out':
       scale = Math.max(scale - 0.25, 0.5);
-      queueRenderPage(pageNum);
-      break;
-    case 'Prev Page':
-      if (pageNum > 1) {
-        pageNum--;
-        queueRenderPage(pageNum);
-      }
-      break;
-    case 'Next Page':
-      if (pageNum < pdfDoc.numPages) {
-        pageNum++;
-        queueRenderPage(pageNum);
-      }
+      renderAllPages();
       break;
   }
 }
 
-// Attach event listeners
+// Attach button listeners
 document.querySelectorAll('.toolbar-btn, .mobile-btn').forEach(button => {
   button.addEventListener('click', () => {
     const action = button.getAttribute('aria-label');
@@ -149,34 +109,16 @@ function createTextBox() {
   const textBox = document.createElement('div');
   textBox.className = 'text-box';
   textBox.contentEditable = true;
-  textBox.style.top = "100px";
+  textBox.style.top = "120px";
   textBox.style.left = "100px";
   textBox.innerText = "Edit text";
-  textBox.draggable = true;
 
-  textBox.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', null);
-    let offsetX = e.offsetX;
-    let offsetY = e.offsetY;
-
-    function onDragMove(ev) {
-      textBox.style.left = (ev.pageX - offsetX) + 'px';
-      textBox.style.top = (ev.pageY - offsetY) + 'px';
-    }
-
-    function onDragEnd() {
-      document.removeEventListener('dragover', onDragMove);
-      document.removeEventListener('drop', onDragEnd);
-    }
-
-    document.addEventListener('dragover', onDragMove);
-    document.addEventListener('drop', onDragEnd);
-  });
-
+  enableDrag(textBox);
   document.getElementById('pdf-container').appendChild(textBox);
+  elements.push(textBox);
 }
 
-// Upload a signature image
+// Upload and add a signature image
 function uploadSignature() {
   const input = document.createElement('input');
   input.type = 'file';
@@ -191,32 +133,54 @@ function uploadSignature() {
       img.style.position = 'absolute';
       img.style.top = "150px";
       img.style.left = "150px";
-      img.style.width = "100px";
-      img.style.height = "auto";
-      img.draggable = true;
 
-      img.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', null);
-        let offsetX = e.offsetX;
-        let offsetY = e.offsetY;
-
-        function onDragMove(ev) {
-          img.style.left = (ev.pageX - offsetX) + 'px';
-          img.style.top = (ev.pageY - offsetY) + 'px';
-        }
-
-        function onDragEnd() {
-          document.removeEventListener('dragover', onDragMove);
-          document.removeEventListener('drop', onDragEnd);
-        }
-
-        document.addEventListener('dragover', onDragMove);
-        document.addEventListener('drop', onDragEnd);
-      });
-
+      enableDrag(img);
       document.getElementById('pdf-container').appendChild(img);
+      elements.push(img);
     };
     reader.readAsDataURL(file);
   };
   input.click();
+}
+
+// Enable dragging for text/signature
+function enableDrag(el) {
+  el.style.position = 'absolute';
+  let offsetX, offsetY;
+
+  el.addEventListener('mousedown', (e) => {
+    offsetX = e.clientX - el.getBoundingClientRect().left;
+    offsetY = e.clientY - el.getBoundingClientRect().top;
+
+    function onMouseMove(ev) {
+      el.style.left = (ev.clientX - offsetX) + 'px';
+      el.style.top = (ev.clientY - offsetY) + 'px';
+    }
+
+    function onMouseUp() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+}
+
+// Undo
+function undo() {
+  if (elements.length > 0) {
+    const el = elements.pop();
+    undoStack.push(el);
+    el.remove();
+  }
+}
+
+// Redo
+function redo() {
+  if (undoStack.length > 0) {
+    const el = undoStack.pop();
+    document.getElementById('pdf-container').appendChild(el);
+    elements.push(el);
+  }
 }
