@@ -1,4 +1,4 @@
-// === FINAL FIXED app.js (Landing + Editor Smart) ===
+// === FINAL LUXURY app.js ===
 
 let pdfDoc = null;
 let scale = 1.5;
@@ -7,10 +7,10 @@ let elements = [];
 let undoStack = [];
 let lastClick = { x: 150, y: 200 };
 
-// Detect page
+// Detect if we're on the Landing page
 const isLandingPage = document.getElementById('landing-main') !== null;
 
-// Only setup PDF.js if NOT Landing page
+// Only setup PDF.js if on the Editor page
 if (!isLandingPage) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 }
@@ -185,4 +185,5 @@ function createTextBox() {
   textBox.addEventListener('touchstart', () => textBox.focus());
 }
 
-// === Signature Modal functions — handled elsewhere
+// === Signature Modal and SavePDF are handled elsewhere
+
