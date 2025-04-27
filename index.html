@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<!-- Desktop Toolbar -->
+<!-- Toolbar (no Prev/Next) -->
 <header id="toolbar">
   <button class="toolbar-btn" aria-label="Upload PDF"><img src="upload-icon.png" alt="Upload"></button>
   <input type="file" id="file-input" accept="application/pdf" style="display:none;">
@@ -21,8 +21,6 @@
   <button class="toolbar-btn" aria-label="Redo"><img src="redo-icon.png" alt="Redo"></button>
   <button class="toolbar-btn" aria-label="Zoom In"><img src="zoomin-icon.png" alt="Zoom In"></button>
   <button class="toolbar-btn" aria-label="Zoom Out"><img src="zoomout-icon.png" alt="Zoom Out"></button>
-  <button class="toolbar-btn" aria-label="Prev Page"><img src="prev-icon.png" alt="Prev"></button>
-  <button class="toolbar-btn" aria-label="Next Page"><img src="next-icon.png" alt="Next"></button>
 </header>
 
 <!-- Mobile Floating Toolbar -->
@@ -33,7 +31,7 @@
   <button class="mobile-btn" aria-label="Add Signature"><img src="signature-icon.png" alt="Signature"></button>
 </div>
 
-<!-- PDF Display -->
+<!-- PDF Container -->
 <main id="pdf-container"></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
