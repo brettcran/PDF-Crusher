@@ -3,41 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Fill & Sign Pro</title>
+  <title>PDF Crusher Pro</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
   <meta name="theme-color" content="#4f46e5">
 </head>
 <body>
 
+<!-- Desktop Toolbar -->
 <header id="toolbar">
-  <button class="upload-btn">📄 Upload PDF</button>
+  <button class="toolbar-btn" aria-label="Upload PDF"><img src="upload-icon.png" alt="Upload"></button>
   <input type="file" id="file-input" accept="application/pdf" style="display:none;">
-  <button id="text-tool-btn">📝 Add Text</button>
-  <select id="font-size-select">
-    <option value="12">12px</option>
-    <option value="14">14px</option>
-    <option value="16" selected>16px</option>
-    <option value="18">18px</option>
-    <option value="24">24px</option>
-    <option value="32">32px</option>
-  </select>
-  <input type="color" id="color-picker" value="#000000">
-  <button id="signature-tool-btn">✍️ Add Signature</button>
-  <button id="undo-btn">↩️ Undo</button>
-  <button id="redo-btn">↪️ Redo</button>
-  <button id="zoom-in-btn">➕ Zoom In</button>
-  <button id="zoom-out-btn">➖ Zoom Out</button>
-  <button id="prev-page">⬅️ Prev</button>
-  <span id="page-info" style="display:none;">Page 1</span>
-  <button id="next-page">➡️ Next</button>
+  <button class="toolbar-btn" aria-label="Save PDF"><img src="save-icon.png" alt="Save"></button>
+  <button class="toolbar-btn" aria-label="Add Text"><img src="text-icon.png" alt="Text"></button>
+  <button class="toolbar-btn" aria-label="Add Signature"><img src="signature-icon.png" alt="Signature"></button>
+  <button class="toolbar-btn" aria-label="Undo"><img src="undo-icon.png" alt="Undo"></button>
+  <button class="toolbar-btn" aria-label="Redo"><img src="redo-icon.png" alt="Redo"></button>
+  <button class="toolbar-btn" aria-label="Zoom In"><img src="zoomin-icon.png" alt="Zoom In"></button>
+  <button class="toolbar-btn" aria-label="Zoom Out"><img src="zoomout-icon.png" alt="Zoom Out"></button>
+  <button class="toolbar-btn" aria-label="Prev Page"><img src="prev-icon.png" alt="Prev"></button>
+  <button class="toolbar-btn" aria-label="Next Page"><img src="next-icon.png" alt="Next"></button>
 </header>
 
-<main id="pdf-container"></main>
-
-<div class="save-btn-container">
-  <button id="save-pdf-btn" class="hero-save-btn">💾 Save PDF</button>
+<!-- Mobile Floating Toolbar -->
+<div id="mobile-toolbar">
+  <button class="mobile-btn" aria-label="Upload PDF"><img src="upload-icon.png" alt="Upload"></button>
+  <button class="mobile-btn" aria-label="Save PDF"><img src="save-icon.png" alt="Save"></button>
+  <button class="mobile-btn" aria-label="Add Text"><img src="text-icon.png" alt="Text"></button>
+  <button class="mobile-btn" aria-label="Add Signature"><img src="signature-icon.png" alt="Signature"></button>
 </div>
+
+<!-- PDF Display -->
+<main id="pdf-container"></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
