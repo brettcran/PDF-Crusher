@@ -1,5 +1,6 @@
-// === app.js (Luxury + Working PDF Load) ===
+// === Fixed app.js (for icon-only UI) ===
 
+// Setup PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
 let pdfDoc = null;
@@ -12,19 +13,19 @@ let ctx = canvas.getContext('2d');
 
 document.getElementById('pdf-container').appendChild(canvas);
 
+// Render a page
 function renderPage(num) {
   pageRendering = true;
-
   pdfDoc.getPage(num).then(function(page) {
-    let viewport = page.getViewport({ scale: scale });
+    const viewport = page.getViewport({ scale });
     canvas.height = viewport.height;
     canvas.width = viewport.width;
 
-    let renderContext = {
+    const renderContext = {
       canvasContext: ctx,
       viewport: viewport
     };
-    let renderTask = page.render(renderContext);
+    const renderTask = page.render(renderContext);
 
     renderTask.promise.then(function() {
       pageRendering = false;
@@ -39,6 +40,7 @@ function renderPage(num) {
   document.getElementById('page-info').textContent = `Page ${num}`;
 }
 
+// Queue rendering
 function queueRenderPage(num) {
   if (pageRendering) {
     pageNumPending = num;
@@ -47,21 +49,10 @@ function queueRenderPage(num) {
   }
 }
 
-document.getElementById('prev-page').addEventListener('click', function() {
-  if (pageNum <= 1) return;
-  pageNum--;
-  queueRenderPage(pageNum);
-});
-
-document.getElementById('next-page').addEventListener('click', function() {
-  if (pageNum >= pdfDoc.numPages) return;
-  pageNum++;
-  queueRenderPage(pageNum);
-});
-
+// Upload PDF
 function loadPDF(file) {
-  const fileReader = new FileReader();
-  fileReader.onload = function() {
+  const reader = new FileReader();
+  reader.onload = function() {
     const typedarray = new Uint8Array(this.result);
 
     pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_) {
@@ -70,14 +61,73 @@ function loadPDF(file) {
       renderPage(pageNum);
     });
   };
-  fileReader.readAsArrayBuffer(file);
+  reader.readAsArrayBuffer(file);
 }
 
-document.querySelector('.upload-btn').addEventListener('click', function() {
-  document.getElementById('file-input').click();
+// Save PDF as image
+function savePDF() {
+  html2canvas(document.getElementById('pdf-container')).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF();
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+    pdf.save('filled-pdf.pdf');
+  });
+}
+
+// Button actions based on aria-label
+function handleButtonClick(action) {
+  switch (action) {
+    case 'Upload PDF':
+      document.getElementById('file-input').click();
+      break;
+    case 'Save PDF':
+      savePDF();
+      break;
+    case 'Add Text':
+      alert('Text tool clicked (feature coming soon)');
+      break;
+    case 'Add Signature':
+      alert('Signature tool clicked (feature coming soon)');
+      break;
+    case 'Undo':
+      alert('Undo clicked (feature coming soon)');
+      break;
+    case 'Redo':
+      alert('Redo clicked (feature coming soon)');
+      break;
+    case 'Zoom In':
+      scale = Math.min(scale + 0.25, 3.0);
+      queueRenderPage(pageNum);
+      break;
+    case 'Zoom Out':
+      scale = Math.max(scale - 0.25, 0.5);
+      queueRenderPage(pageNum);
+      break;
+    case 'Prev Page':
+      if (pageNum > 1) {
+        pageNum--;
+        queueRenderPage(pageNum);
+      }
+      break;
+    case 'Next Page':
+      if (pageNum < pdfDoc.numPages) {
+        pageNum++;
+        queueRenderPage(pageNum);
+      }
+      break;
+  }
+}
+
+// Attach event listeners
+document.querySelectorAll('.toolbar-btn, .mobile-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const action = button.getAttribute('aria-label');
+    handleButtonClick(action);
+  });
 });
 
-document.getElementById('file-input').addEventListener('change', function(e) {
+// File upload trigger
+document.getElementById('file-input').addEventListener('change', (e) => {
   if (e.target.files.length > 0) {
     loadPDF(e.target.files[0]);
   }
