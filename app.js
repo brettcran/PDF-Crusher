@@ -1,4 +1,4 @@
-// === Fixed app.js (for icon-only UI) ===
+// === Final Luxury app.js ===
 
 // Setup PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
@@ -10,8 +10,12 @@ let pageNumPending = null;
 let scale = 1.5;
 let canvas = document.createElement('canvas');
 let ctx = canvas.getContext('2d');
+let uploadedFileName = "filled-pdf"; // Default fallback
 
 document.getElementById('pdf-container').appendChild(canvas);
+
+// Enable pinch zoom (allow touch gestures)
+document.getElementById('pdf-container').style.touchAction = "manipulation";
 
 // Render a page
 function renderPage(num) {
@@ -49,8 +53,9 @@ function queueRenderPage(num) {
   }
 }
 
-// Upload PDF
+// Load uploaded PDF
 function loadPDF(file) {
+  uploadedFileName = file.name.replace(/\.[^/.]+$/, ""); // Remove .pdf extension
   const reader = new FileReader();
   reader.onload = function() {
     const typedarray = new Uint8Array(this.result);
@@ -66,15 +71,21 @@ function loadPDF(file) {
 
 // Save PDF as image
 function savePDF() {
-  html2canvas(document.getElementById('pdf-container')).then(canvas => {
+  const tempScale = 1.5; // Reset scale for export
+  const originalTransform = canvas.style.transform;
+  canvas.style.transform = '';
+
+  html2canvas(document.getElementById('pdf-container'), { scale: tempScale }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jspdf.jsPDF();
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-    pdf.save('filled-pdf.pdf');
+    pdf.save(`${uploadedFileName}-filled.pdf`);
+    // Restore any transforms
+    canvas.style.transform = originalTransform;
   });
 }
 
-// Button actions based on aria-label
+// Handle toolbar button clicks
 function handleButtonClick(action) {
   switch (action) {
     case 'Upload PDF':
@@ -84,16 +95,16 @@ function handleButtonClick(action) {
       savePDF();
       break;
     case 'Add Text':
-      alert('Text tool clicked (feature coming soon)');
+      createTextBox();
       break;
     case 'Add Signature':
-      alert('Signature tool clicked (feature coming soon)');
+      uploadSignature();
       break;
     case 'Undo':
-      alert('Undo clicked (feature coming soon)');
+      alert('Undo clicked (undo feature coming soon)');
       break;
     case 'Redo':
-      alert('Redo clicked (feature coming soon)');
+      alert('Redo clicked (redo feature coming soon)');
       break;
     case 'Zoom In':
       scale = Math.min(scale + 0.25, 3.0);
@@ -132,3 +143,80 @@ document.getElementById('file-input').addEventListener('change', (e) => {
     loadPDF(e.target.files[0]);
   }
 });
+
+// Create draggable editable text box
+function createTextBox() {
+  const textBox = document.createElement('div');
+  textBox.className = 'text-box';
+  textBox.contentEditable = true;
+  textBox.style.top = "100px";
+  textBox.style.left = "100px";
+  textBox.innerText = "Edit text";
+  textBox.draggable = true;
+
+  textBox.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', null);
+    let offsetX = e.offsetX;
+    let offsetY = e.offsetY;
+
+    function onDragMove(ev) {
+      textBox.style.left = (ev.pageX - offsetX) + 'px';
+      textBox.style.top = (ev.pageY - offsetY) + 'px';
+    }
+
+    function onDragEnd() {
+      document.removeEventListener('dragover', onDragMove);
+      document.removeEventListener('drop', onDragEnd);
+    }
+
+    document.addEventListener('dragover', onDragMove);
+    document.addEventListener('drop', onDragEnd);
+  });
+
+  document.getElementById('pdf-container').appendChild(textBox);
+}
+
+// Upload a signature image
+function uploadSignature() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.src = event.target.result;
+      img.className = 'signature-image';
+      img.style.position = 'absolute';
+      img.style.top = "150px";
+      img.style.left = "150px";
+      img.style.width = "100px";
+      img.style.height = "auto";
+      img.draggable = true;
+
+      img.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', null);
+        let offsetX = e.offsetX;
+        let offsetY = e.offsetY;
+
+        function onDragMove(ev) {
+          img.style.left = (ev.pageX - offsetX) + 'px';
+          img.style.top = (ev.pageY - offsetY) + 'px';
+        }
+
+        function onDragEnd() {
+          document.removeEventListener('dragover', onDragMove);
+          document.removeEventListener('drop', onDragEnd);
+        }
+
+        document.addEventListener('dragover', onDragMove);
+        document.addEventListener('drop', onDragEnd);
+      });
+
+      document.getElementById('pdf-container').appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
