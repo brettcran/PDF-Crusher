@@ -1,86 +1,76 @@
+// === uiHandler.js ===
+// Handle textboxes, dragging, undo/redo
+
+let history = [];
+let redoStack = [];
+let lastClick = { x: 100, y: 100 };
+
 function createTextBox() {
   const textBox = document.createElement('div');
   textBox.className = 'text-box';
   textBox.contentEditable = true;
-  textBox.innerText = 'Enter text';
-  textBox.style.top = `${lastClick.y}px`;
+  textBox.innerText = 'Text';
   textBox.style.left = `${lastClick.x}px`;
-  textBox.style.background = 'transparent'; // Transparent background
+  textBox.style.top = `${lastClick.y}px`;
 
-  enableSmartDrag(textBox);
+  textBox.addEventListener('mousedown', startDrag);
   document.getElementById('user-layer').appendChild(textBox);
-  elements.push(textBox);
-
-  setTimeout(() => {
-    textBox.focus();
-  }, 100);
-  saveState();
+  saveHistory();
 }
 
-function enableSmartDrag(el) {
-  let offsetX = 0;
-  let offsetY = 0;
-  let dragging = false;
-  let longPressTimer = null;
+function startDrag(e) {
+  const element = e.target.closest('.text-box, .signature-wrapper');
+  if (!element) return;
 
-  el.style.position = 'absolute';
-  el.style.userSelect = 'none';
-  el.style.touchAction = 'none';
-  el.style.zIndex = 1000;
+  let offsetX = e.clientX - element.getBoundingClientRect().left;
+  let offsetY = e.clientY - element.getBoundingClientRect().top;
 
-  el.addEventListener('mousedown', startHold);
-  el.addEventListener('touchstart', startHold);
-
-  function startHold(e) {
-    e.preventDefault();
-    if (e.type === 'mousedown' && e.button !== 0) return;
-
-    longPressTimer = setTimeout(() => {
-      dragging = true;
-      offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - el.offsetLeft;
-      offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - el.offsetTop;
-    }, 200);
+  function moveAt(ev) {
+    element.style.left = `${ev.clientX - offsetX}px`;
+    element.style.top = `${ev.clientY - offsetY}px`;
   }
 
-  el.addEventListener('mousemove', (e) => {
-    if (dragging) {
-      el.style.left = `${(e.clientX - offsetX)}px`;
-      el.style.top = `${(e.clientY - offsetY)}px`;
-    }
-  });
-
-  el.addEventListener('touchmove', (e) => {
-    if (dragging && e.touches.length === 1) {
-      const touch = e.touches[0];
-      el.style.left = `${(touch.clientX - offsetX)}px`;
-      el.style.top = `${(touch.clientY - offsetY)}px`;
-    }
-  });
-
-  el.addEventListener('mouseup', endHold);
-  el.addEventListener('touchend', endHold);
-
-  function endHold(e) {
-    clearTimeout(longPressTimer);
-    if (dragging) {
-      dragging = false;
-      saveState();
-    } else {
-      el.focus();
-    }
+  function onUp() {
+    document.removeEventListener('mousemove', moveAt);
+    document.removeEventListener('mouseup', onUp);
+    saveHistory();
   }
 
-  el.addEventListener('click', () => {
-    el.focus();
-  });
+  document.addEventListener('mousemove', moveAt);
+  document.addEventListener('mouseup', onUp);
+}
 
-  el.addEventListener('focus', () => {
-    el.style.border = '2px solid #4f46e5';
-    el.style.background = 'rgba(255, 255, 255, 0.8)';
-  });
+function undo() {
+  if (history.length > 0) {
+    const state = history.pop();
+    redoStack.push(document.getElementById('user-layer').innerHTML);
+    document.getElementById('user-layer').innerHTML = state;
+    restoreEventListeners();
+  }
+}
 
-  el.addEventListener('blur', () => {
-    el.style.border = '2px dashed #6366f1';
-    el.style.background = 'transparent';
+function redo() {
+  if (redoStack.length > 0) {
+    const state = redoStack.pop();
+    history.push(document.getElementById('user-layer').innerHTML);
+    document.getElementById('user-layer').innerHTML = state;
+    restoreEventListeners();
+  }
+}
+
+function saveHistory() {
+  history.push(document.getElementById('user-layer').innerHTML);
+  redoStack = [];
+}
+
+function restoreEventListeners() {
+  document.querySelectorAll('.text-box, .signature-wrapper').forEach(el => {
+    el.addEventListener('mousedown', startDrag);
   });
 }
+
+// Track last click for placement
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#toolbar') || e.target.closest('.modal')) return;
+  lastClick = { x: e.pageX, y: e.pageY };
+});
