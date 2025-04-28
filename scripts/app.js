@@ -153,7 +153,9 @@ function loadStoredOrPromptFile() {
   } else {
     document.getElementById('file-input').click();
   }
-  async function renderAllPages() {
+}
+
+async function renderAllPages() {
   const container = document.getElementById('pdf-viewer') || document.getElementById('pdf-container');
   container.innerHTML = '';
 
@@ -171,7 +173,6 @@ function loadStoredOrPromptFile() {
     container.appendChild(canvas);
   }
 
-  // Create a user-layer for overlays
   if (!document.getElementById('user-layer')) {
     const layer = document.createElement('div');
     layer.id = 'user-layer';
@@ -181,6 +182,6 @@ function loadStoredOrPromptFile() {
     layer.style.right = '0';
     layer.style.bottom = '0';
     layer.style.pointerEvents = 'none';
-    document.getElementById('pdf-container').appendChild(layer);
+    container.appendChild(layer);
   }
 }
