@@ -34,8 +34,8 @@
     <span id="close-modal">&times;</span>
     <canvas id="signature-pad" width="300" height="150"></canvas>
     <br>
-    <button id="clear-signature">Clear</button>
-    <button id="save-signature">Save Signature</button>
+    <button id="clear-signature" class="secondary-btn">Clear</button>
+    <button id="save-signature" class="primary-btn">Save Signature</button>
     <h3>Saved Signatures:</h3>
     <div id="saved-signatures"></div>
     <br>
@@ -53,8 +53,8 @@
       <li><img src="save-icon.png" alt="Save" class="help-icon"> Save PDF</li>
       <li><img src="text-icon.png" alt="Text" class="help-icon"> Add Text</li>
       <li><img src="signature-icon.png" alt="Signature" class="help-icon"> Add Signature</li>
-      <li><img src="undo-icon.png" alt="Undo" class="help-icon"> Undo</li>
-      <li><img src="redo-icon.png" alt="Redo" class="help-icon"> Redo</li>
+      <li><img src="undo-icon.png" alt="Undo" class="help-icon"> Undo Changes</li>
+      <li><img src="redo-icon.png" alt="Redo" class="help-icon"> Redo Actions</li>
       <li><img src="zoomin-icon.png" alt="Zoom In" class="help-icon"> Zoom In</li>
       <li><img src="zoomout-icon.png" alt="Zoom Out" class="help-icon"> Zoom Out</li>
     </ul>
@@ -64,7 +64,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-<script src="app.js"></script>
+
+<!-- Modular Scripts -->
+<script src="scripts/pdfHandler.js"></script>
+<script src="scripts/uiHandler.js"></script>
+<script src="scripts/storageHandler.js"></script>
+<script src="scripts/signatureHandler.js"></script>
+<script src="scripts/app.js"></script>
 
 </body>
 </html>
