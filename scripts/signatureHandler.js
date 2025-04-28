@@ -14,18 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
     clearSignatureBtn.addEventListener('click', () => signaturePad.clear());
   }
   if (closeSignatureBtn) {
-    closeSignatureModal();
+    closeSignatureBtn.addEventListener('click', () => {
+      document.getElementById('signature-modal').style.display = 'none';
+    });
   }
 });
 
 function openSignatureModal() {
   document.getElementById('signature-modal').style.display = 'flex';
   const canvas = document.getElementById('signature-pad');
-  signaturePad = new SignaturePad(canvas);
-}
-
-function closeSignatureModal() {
-  document.getElementById('signature-modal').style.display = 'none';
+  signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'white',
+    penColor: 'black'
+  });
 }
 
 function saveSignature() {
@@ -38,7 +39,7 @@ function saveSignature() {
   img.src = dataURL;
   img.className = 'signature-image';
   img.style.position = 'absolute';
-  img.style.top = '100px';
+  img.style.top = '150px';
   img.style.left = '100px';
   img.style.width = '150px';
   img.style.height = '60px';
@@ -55,5 +56,5 @@ function saveSignature() {
     img.style.top = `${e.pageY - 30}px`;
   });
 
-  closeSignatureModal();
+  document.getElementById('signature-modal').style.display = 'none';
 }
