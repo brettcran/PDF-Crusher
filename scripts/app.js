@@ -22,8 +22,20 @@ function setupLandingPage() {
   document.getElementById('file-input').addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
-      localStorage.setItem('currentFile', file.name);
-      window.location.href = 'editor.html';
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        sessionStorage.setItem('uploadedPDF', event.target.result);
+        localStorage.setItem('currentFile', file.name);
+        updateRecentFiles(file.name);
+        window.location.href = 'editor.html';
+      };
+
+      reader.onerror = function() {
+        alert('Error reading file.');
+      };
+
+      reader.readAsDataURL(file);
     }
   });
 
@@ -106,12 +118,23 @@ function handleToolbarAction(action) {
   }
 }
 
-// Load File or Prompt Again
+// Load Stored File from sessionStorage or fallback
 function loadStoredOrPromptFile() {
-  const fileInput = document.getElementById('file-input');
-  const currentFile = localStorage.getItem('currentFile');
+  const base64Data = sessionStorage.getItem('uploadedPDF');
 
-  if (currentFile) {
-    fileInput.click(); // Force open file picker again
+  if (base64Data) {
+    fetch(base64Data)
+      .then(res => res.arrayBuffer())
+      .then(buffer => {
+        pdfjsLib.getDocument(new Uint8Array(buffer)).promise.then((pdfDoc_) => {
+          pdfDoc = pdfDoc_;
+          renderAllPages();
+        });
+      })
+      .catch(() => {
+        alert('Failed to load PDF.');
+      });
+  } else {
+    document.getElementById('file-input').click(); // fallback
   }
 }
