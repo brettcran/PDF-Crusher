@@ -10,68 +10,8 @@
 </head>
 <body>
 
-<header id="toolbar" class="fade-in">
+<header id="toolbar">
   <button class="toolbar-btn" aria-label="Upload PDF"><img src="upload-icon.png" alt="Upload"></button>
   <input type="file" id="file-input" accept="application/pdf" style="display:none;">
   <button class="toolbar-btn" aria-label="Save PDF"><img src="save-icon.png" alt="Save"></button>
-  <button class="toolbar-btn" aria-label="Add Text"><img src="text-icon.png" alt="Text"></button>
-  <button class="toolbar-btn" aria-label="Add Signature"><img src="signature-icon.png" alt="Signature"></button>
-  <button class="toolbar-btn" aria-label="Undo"><img src="undo-icon.png" alt="Undo"></button>
-  <button class="toolbar-btn" aria-label="Redo"><img src="redo-icon.png" alt="Redo"></button>
-  <button class="toolbar-btn" aria-label="Zoom In"><img src="zoomin-icon.png" alt="Zoom In"></button>
-  <button class="toolbar-btn" aria-label="Zoom Out"><img src="zoomout-icon.png" alt="Zoom Out"></button>
-  <button id="help-btn" class="toolbar-btn" aria-label="Help"><img src="help-icon.png" alt="Help"></button>
-</header>
-
-<main id="pdf-container" class="fade-in">
-  <div id="pdf-viewer"></div>
-  <div id="user-layer"></div>
-</main>
-
-<!-- Signature Modal -->
-<div id="signature-modal" class="modal">
-  <div class="modal-content">
-    <span id="close-modal">&times;</span>
-    <canvas id="signature-pad" width="300" height="150"></canvas>
-    <br>
-    <button id="clear-signature" class="secondary-btn">Clear</button>
-    <button id="save-signature" class="primary-btn">Save Signature</button>
-    <h3>Saved Signatures:</h3>
-    <div id="saved-signatures"></div>
-    <br>
-    <input type="file" id="upload-signature" accept="image/*">
-  </div>
-</div>
-
-<!-- Help Modal -->
-<div id="help-modal" class="modal">
-  <div class="modal-content">
-    <span id="close-help">&times;</span>
-    <h2>Toolbar Guide</h2>
-    <ul class="help-list">
-      <li><img src="upload-icon.png" alt="Upload" class="help-icon"> Upload PDF</li>
-      <li><img src="save-icon.png" alt="Save" class="help-icon"> Save PDF</li>
-      <li><img src="text-icon.png" alt="Text" class="help-icon"> Add Text</li>
-      <li><img src="signature-icon.png" alt="Signature" class="help-icon"> Add Signature</li>
-      <li><img src="undo-icon.png" alt="Undo" class="help-icon"> Undo Changes</li>
-      <li><img src="redo-icon.png" alt="Redo" class="help-icon"> Redo Actions</li>
-      <li><img src="zoomin-icon.png" alt="Zoom In" class="help-icon"> Zoom In</li>
-      <li><img src="zoomout-icon.png" alt="Zoom Out" class="help-icon"> Zoom Out</li>
-    </ul>
-  </div>
-</div>
-
-<!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-
-<!-- Modular Scripts -->
-<script src="scripts/storageHandler.js"></script>
-<script src="scripts/pdfHandler.js"></script>
-<script src="scripts/uiHandler.js"></script>
-<script src="scripts/signatureHandler.js"></script>
-<script src="scripts/app.js"></script>
-
-</body>
-</html>
+  <button class="toolbar-btn" aria
