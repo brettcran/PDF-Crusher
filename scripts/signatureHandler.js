@@ -20,11 +20,13 @@ document.getElementById('clear-signature').addEventListener('click', () => {
   signaturePad.clear();
 });
 document.getElementById('save-signature').addEventListener('click', () => {
-  const dataURL = signaturePad.toDataURL();
-  savedSignatures.push(dataURL);
-  localStorage.setItem('savedSignatures', JSON.stringify(savedSignatures));
-  loadSavedSignatures();
-  signaturePad.clear();
+  if (!signaturePad.isEmpty()) {
+    const dataURL = signaturePad.toDataURL();
+    savedSignatures.push(dataURL);
+    localStorage.setItem('savedSignatures', JSON.stringify(savedSignatures));
+    loadSavedSignatures();
+    signaturePad.clear();
+  }
 });
 
 function loadSavedSignatures() {
@@ -32,7 +34,7 @@ function loadSavedSignatures() {
   container.innerHTML = '';
   savedSignatures = JSON.parse(localStorage.getItem('savedSignatures')) || [];
 
-  savedSignatures.forEach((sig, index) => {
+  savedSignatures.forEach((sig) => {
     const img = document.createElement('img');
     img.src = sig;
     img.style.width = '100px';
@@ -53,8 +55,8 @@ function insertSignature(imageSrc) {
   wrapper.style.top = `${lastClick.y}px`;
 
   const img = document.createElement('img');
-  img.className = 'signature-image';
   img.src = imageSrc;
+  img.className = 'signature-image';
 
   wrapper.appendChild(img);
   wrapper.addEventListener('mousedown', startDrag);
