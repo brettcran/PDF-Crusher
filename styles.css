@@ -1,25 +1,6 @@
-/*
-===========================================
- PDF Crusher - Luxury SaaS Styles.css
- Author: PDF Crusher Team
- Last Updated: 2025-04-27
-===========================================
+/* === styles.css === */
 
- TABLE OF CONTENTS
- -----------------
- 1. Base Reset
- 2. Typography and Colors
- 3. Toolbar Styles
- 4. PDF Viewer Layout
- 5. User Layer (Text Boxes, Signatures)
- 6. Landing Page (Hero, Upload, Recent Files)
- 7. Help Modal Styling
- 8. Save Button Hero Style
- 9. Responsive Media Queries
-===========================================
-*/
-
-/* === 1. Base Reset === */
+/* Base Reset */
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -29,13 +10,13 @@ body {
   overflow-x: hidden;
 }
 
-/* === 2. Typography and Colors === */
+/* Landing & Editor shared header styles */
 h1, h2, h3, p {
   margin: 0;
   padding: 0;
 }
 
-/* === 3. Toolbar Styles === */
+/* Toolbar */
 #toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -45,10 +26,10 @@ h1, h2, h3, p {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  justify-content: center;
   position: sticky;
   top: 0;
   z-index: 1000;
-  justify-content: center;
 }
 
 #toolbar button {
@@ -67,7 +48,7 @@ h1, h2, h3, p {
   box-shadow: 0 6px 12px rgba(99, 102, 241, 0.5);
 }
 
-/* === 4. PDF Viewer Layout === */
+/* PDF Viewer */
 #pdf-container {
   position: relative;
   height: calc(100vh - 120px);
@@ -85,31 +66,26 @@ canvas {
   background: #ffffff;
 }
 
-/* === 5. User Layer (Text Boxes, Signatures) === */
+/* Textbox + Signature Styles */
 .text-box {
   position: absolute;
   background: transparent;
   border: 2px dashed #6366f1;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  resize: both;
+  overflow: auto;
   cursor: move;
-  user-select: none;
+  padding: 8px;
   min-width: 60px;
   min-height: 24px;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
   transition: all 0.3s ease;
   font-size: 16px;
   font-weight: 500;
 }
 
-.text-box[contenteditable="true"]:focus {
-  outline: none;
-  border: 2px solid #4f46e5;
-  background: rgba(255, 255, 255, 0.8);
+.text-box:not(.editing) {
+  border: none;
+  resize: none;
 }
 
 .signature-wrapper {
@@ -117,21 +93,21 @@ canvas {
   background: transparent;
   border: 2px dashed #6366f1;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  resize: both;
+  overflow: auto;
   cursor: move;
-  user-select: none;
   padding: 4px;
   transition: all 0.3s ease;
 }
 
-.signature-image {
+.signature-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
 }
 
-/* === 6. Landing Page (Hero, Upload, Recent Files) === */
+/* Landing Page */
 #landing-main {
   min-height: 100vh;
   display: flex;
@@ -142,18 +118,53 @@ canvas {
   text-align: center;
 }
 
+/* Hero Title */
 .landing-title {
   font-size: 48px;
   color: #4f46e5;
   margin-bottom: 12px;
 }
 
+/* Hero Subtitle */
 .landing-subtitle {
   font-size: 18px;
   color: #6b7280;
   margin-bottom: 32px;
 }
 
+/* Upload & Help Buttons */
+.primary-btn, .secondary-btn {
+  padding: 14px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 8px;
+}
+
+.primary-btn {
+  background: linear-gradient(145deg, #6366f1, #4f46e5);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(145deg, #4f46e5, #6366f1);
+  transform: scale(1.05);
+}
+
+.secondary-btn {
+  background: #f9fafb;
+  color: #4f46e5;
+  border: 2px solid #4f46e5;
+}
+
+.secondary-btn:hover {
+  background: #e0e7ff;
+}
+
+/* Recent Files */
 .recent-title {
   margin-top: 48px;
   font-size: 24px;
@@ -180,7 +191,7 @@ canvas {
   color: #4f46e5;
 }
 
-/* === 7. Help Modal Styling === */
+/* Modal (Help) */
 .modal {
   display: none;
   position: fixed;
@@ -223,41 +234,10 @@ canvas {
   margin-bottom: 10px;
 }
 
-.help-icon {
-  width: 28px;
-  height: 28px;
-  margin-right: 10px;
-}
-
-/* === 8. Save Button Hero Style === */
-.save-btn-container {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.hero-save-btn {
-  padding: 16px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  background: linear-gradient(145deg, #4f46e5, #6366f1);
-  color: white;
-  border: none;
-  border-radius: 9999px;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-  transition: all 0.4s ease;
-}
-
-.hero-save-btn:hover {
-  background: linear-gradient(145deg, #6366f1, #4f46e5);
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
-}
-
-/* === 9. Responsive Media Queries === */
+/* Mobile */
 @media (max-width: 768px) {
   #toolbar {
     flex-direction: column;
-    gap: 10px;
     padding: 16px;
   }
 
