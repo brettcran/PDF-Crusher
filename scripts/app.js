@@ -153,4 +153,34 @@ function loadStoredOrPromptFile() {
   } else {
     document.getElementById('file-input').click();
   }
+  async function renderAllPages() {
+  const container = document.getElementById('pdf-viewer') || document.getElementById('pdf-container');
+  container.innerHTML = '';
+
+  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+    container.appendChild(canvas);
+  }
+
+  // Create a user-layer for overlays
+  if (!document.getElementById('user-layer')) {
+    const layer = document.createElement('div');
+    layer.id = 'user-layer';
+    layer.style.position = 'absolute';
+    layer.style.top = '0';
+    layer.style.left = '0';
+    layer.style.right = '0';
+    layer.style.bottom = '0';
+    layer.style.pointerEvents = 'none';
+    document.getElementById('pdf-container').appendChild(layer);
+  }
 }
