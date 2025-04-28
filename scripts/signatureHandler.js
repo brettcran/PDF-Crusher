@@ -5,14 +5,20 @@ let signaturePad;
 let savedSignatures = [];
 
 function openSignatureModal() {
-  document.getElementById('signature-modal').style.display = 'block';
+  const modal = document.getElementById('signature-modal');
+  if (modal) {
+    modal.style.display = 'block';
+  }
   const canvas = document.getElementById('signature-pad');
   signaturePad = new SignaturePad(canvas);
   loadSavedSignatures();
 }
 
 function closeSignatureModal() {
-  document.getElementById('signature-modal').style.display = 'none';
+  const modal = document.getElementById('signature-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 const closeModalBtn = document.getElementById('close-modal');
@@ -25,7 +31,7 @@ document.getElementById('clear-signature')?.addEventListener('click', () => {
 });
 
 document.getElementById('save-signature')?.addEventListener('click', () => {
-  if (signaturePad && !signaturePad.isEmpty()) {
+  if (!signaturePad?.isEmpty()) {
     const dataURL = signaturePad.toDataURL();
     savedSignatures.push(dataURL);
     localStorage.setItem('savedSignatures', JSON.stringify(savedSignatures));
@@ -37,7 +43,6 @@ document.getElementById('save-signature')?.addEventListener('click', () => {
 function loadSavedSignatures() {
   const container = document.getElementById('saved-signatures');
   if (!container) return;
-
   container.innerHTML = '';
   savedSignatures = JSON.parse(localStorage.getItem('savedSignatures')) || [];
 
@@ -67,6 +72,9 @@ function insertSignature(imageSrc) {
 
   wrapper.appendChild(img);
   wrapper.addEventListener('mousedown', startDrag);
+  wrapper.style.resize = 'both';
+  wrapper.style.overflow = 'auto';
+  wrapper.style.pointerEvents = 'auto';
 
   document.getElementById('user-layer').appendChild(wrapper);
   saveHistory();
