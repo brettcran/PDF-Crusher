@@ -1,74 +1,43 @@
 // === pdfHandler.js ===
-// Handles PDF.js Loading, Rendering, Zooming
+// Handle PDF Saving with overlays
 
-let pdfDoc = null;
-let scale = 1.5;
-
-// Set PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
-
-// Load PDF from file
-function loadPDF(file) {
-  const reader = new FileReader();
-
-  reader.onload = function() {
-    const typedarray = new Uint8Array(this.result);
-
-    if (window.innerWidth <= 768) {
-      scale = Math.min(1.0, window.innerWidth / 800);
-    } else {
-      scale = 1.5;
-    }
-
-    pdfjsLib.getDocument(typedarray).promise
-      .then((pdfDoc_) => {
-        pdfDoc = pdfDoc_;
-        renderAllPages();
-      })
-      .catch((err) => {
-        alert('Failed to load PDF: ' + err.message);
-      });
-  };
-
-  reader.onerror = function() {
-    alert('Error reading file.');
-  };
-
-  reader.readAsArrayBuffer(file);
-}
-
-// Render all pages of PDF
-function renderAllPages() {
+async function savePDF() {
   const viewer = document.getElementById('pdf-viewer');
-  viewer.innerHTML = '';
+  const userLayer = document.getElementById('user-layer');
 
-  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    pdfDoc.getPage(pageNum).then((page) => {
-      const viewport = page.getViewport({ scale });
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+  // Clone current canvas with text/signatures overlaid
+  const combined = document.createElement('div');
+  combined.style.position = 'relative';
+  combined.style.width = `${viewer.offsetWidth}px`;
+  combined.style.height = `${viewer.offsetHeight}px`;
 
-      page.render({ canvasContext: ctx, viewport });
+  const pdfCanvas = viewer.querySelector('canvas');
+  const userLayerClone = userLayer.cloneNode(true);
 
-      viewer.appendChild(canvas);
-    });
-  }
-}
+  pdfCanvas.style.position = 'absolute';
+  pdfCanvas.style.top = '0';
+  pdfCanvas.style.left = '0';
+  combined.appendChild(pdfCanvas.cloneNode(true));
 
-// Zoom In
-function zoomIn() {
-  if (scale < 3.0) {
-    scale += 0.25;
-    renderAllPages();
-  }
-}
+  userLayerClone.querySelectorAll('.text-box, .signature-wrapper').forEach(box => {
+    box.style.position = 'absolute';
+    box.style.background = 'transparent';
+    combined.appendChild(box.cloneNode(true));
+  });
 
-// Zoom Out
-function zoomOut() {
-  if (scale > 0.5) {
-    scale -= 0.25;
-    renderAllPages();
-  }
+  const canvas = await html2canvas(combined, { backgroundColor: null });
+  const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('portrait', 'pt', [canvas.width, canvas.height]);
+  pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+
+  // Use stored filename if available
+  const filename = localStorage.getItem('currentFile') || 'edited.pdf';
+  pdf.save(filename);
+
+  // After save, redirect to landing page
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 500);
 }
