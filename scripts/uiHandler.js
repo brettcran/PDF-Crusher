@@ -7,14 +7,22 @@ let lastClick = { x: 100, y: 100 };
 
 function createTextBox() {
   const textBox = document.createElement('div');
-  textBox.className = 'text-box';
+  textBox.className = 'text-box editing';
   textBox.contentEditable = true;
   textBox.innerText = 'Text';
   textBox.style.left = `${lastClick.x}px`;
   textBox.style.top = `${lastClick.y}px`;
 
   textBox.addEventListener('mousedown', startDrag);
+  textBox.addEventListener('focus', () => {
+    textBox.classList.add('editing');
+  });
+  textBox.addEventListener('blur', () => {
+    textBox.classList.remove('editing');
+  });
+
   document.getElementById('user-layer').appendChild(textBox);
+  textBox.focus();
   saveHistory();
 }
 
@@ -69,7 +77,7 @@ function restoreEventListeners() {
   });
 }
 
-// Track last click for placement
+// Track last click
 document.addEventListener('click', (e) => {
   if (e.target.closest('#toolbar') || e.target.closest('.modal')) return;
   lastClick = { x: e.pageX, y: e.pageY };
