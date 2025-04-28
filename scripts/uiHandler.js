@@ -1,84 +1,37 @@
-// === uiHandler.js ===
-// Handle textboxes, dragging, undo/redo
-
-let history = [];
-let redoStack = [];
-let lastClick = { x: 100, y: 100 };
+// scripts/uiHandler.js
 
 function createTextBox() {
-  const textBox = document.createElement('div');
-  textBox.className = 'text-box editing';
-  textBox.contentEditable = true;
-  textBox.innerText = 'Text';
-  textBox.style.left = `${lastClick.x}px`;
-  textBox.style.top = `${lastClick.y}px`;
+  const div = document.createElement('div');
+  div.contentEditable = true;
+  div.className = 'text-box';
+  div.style.position = 'absolute';
+  div.style.top = '150px';
+  div.style.left = '100px';
+  div.style.minWidth = '100px';
+  div.style.minHeight = '30px';
+  div.style.background = 'transparent';
+  div.style.color = '#111827';
+  div.style.fontSize = '16px';
+  div.style.border = '1px dashed #4f46e5';
+  div.style.padding = '4px 8px';
+  div.style.borderRadius = '8px';
+  div.style.cursor = 'move';
+  document.getElementById('pdf-container').appendChild(div);
 
-  textBox.addEventListener('mousedown', startDrag);
-  textBox.addEventListener('focus', () => {
-    textBox.classList.add('editing');
+  div.draggable = true;
+  div.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', '');
   });
-  textBox.addEventListener('blur', () => {
-    textBox.classList.remove('editing');
+  div.addEventListener('dragend', (e) => {
+    div.style.left = `${e.pageX - 50}px`;
+    div.style.top = `${e.pageY - 15}px`;
   });
-
-  document.getElementById('user-layer').appendChild(textBox);
-  textBox.focus();
-  saveHistory();
-}
-
-function startDrag(e) {
-  const element = e.target.closest('.text-box, .signature-wrapper');
-  if (!element) return;
-
-  let offsetX = e.clientX - element.getBoundingClientRect().left;
-  let offsetY = e.clientY - element.getBoundingClientRect().top;
-
-  function moveAt(ev) {
-    element.style.left = `${ev.clientX - offsetX}px`;
-    element.style.top = `${ev.clientY - offsetY}px`;
-  }
-
-  function onUp() {
-    document.removeEventListener('mousemove', moveAt);
-    document.removeEventListener('mouseup', onUp);
-    saveHistory();
-  }
-
-  document.addEventListener('mousemove', moveAt);
-  document.addEventListener('mouseup', onUp);
 }
 
 function undo() {
-  if (history.length > 0) {
-    const state = history.pop();
-    redoStack.push(document.getElementById('user-layer').innerHTML);
-    document.getElementById('user-layer').innerHTML = state;
-    restoreEventListeners();
-  }
+  // Optional: To implement if undo/redo flow needed
 }
 
 function redo() {
-  if (redoStack.length > 0) {
-    const state = redoStack.pop();
-    history.push(document.getElementById('user-layer').innerHTML);
-    document.getElementById('user-layer').innerHTML = state;
-    restoreEventListeners();
-  }
+  // Optional: To implement if undo/redo flow needed
 }
-
-function saveHistory() {
-  history.push(document.getElementById('user-layer').innerHTML);
-  redoStack = [];
-}
-
-function restoreEventListeners() {
-  document.querySelectorAll('.text-box, .signature-wrapper').forEach(el => {
-    el.addEventListener('mousedown', startDrag);
-  });
-}
-
-// Track last click
-document.addEventListener('click', (e) => {
-  if (e.target.closest('#toolbar') || e.target.closest('.modal')) return;
-  lastClick = { x: e.pageX, y: e.pageY };
-});
