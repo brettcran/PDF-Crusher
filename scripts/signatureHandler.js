@@ -15,12 +15,17 @@ function closeSignatureModal() {
   document.getElementById('signature-modal').style.display = 'none';
 }
 
-document.getElementById('close-modal').addEventListener('click', closeSignatureModal);
-document.getElementById('clear-signature').addEventListener('click', () => {
-  signaturePad.clear();
+const closeModalBtn = document.getElementById('close-modal');
+if (closeModalBtn) {
+  closeModalBtn.addEventListener('click', closeSignatureModal);
+}
+
+document.getElementById('clear-signature')?.addEventListener('click', () => {
+  signaturePad?.clear();
 });
-document.getElementById('save-signature').addEventListener('click', () => {
-  if (!signaturePad.isEmpty()) {
+
+document.getElementById('save-signature')?.addEventListener('click', () => {
+  if (signaturePad && !signaturePad.isEmpty()) {
     const dataURL = signaturePad.toDataURL();
     savedSignatures.push(dataURL);
     localStorage.setItem('savedSignatures', JSON.stringify(savedSignatures));
@@ -31,6 +36,8 @@ document.getElementById('save-signature').addEventListener('click', () => {
 
 function loadSavedSignatures() {
   const container = document.getElementById('saved-signatures');
+  if (!container) return;
+
   container.innerHTML = '';
   savedSignatures = JSON.parse(localStorage.getItem('savedSignatures')) || [];
 
