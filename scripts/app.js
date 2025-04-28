@@ -155,6 +155,34 @@ function loadStoredOrPromptFile() {
   }
 }
 
+// === Zoom Functionality ===
+let zoomScale = 1;
+
+function zoomIn() {
+  zoomScale += 0.2;
+  applyZoom();
+}
+
+function zoomOut() {
+  zoomScale = Math.max(0.4, zoomScale - 0.2); // Minimum zoom
+  applyZoom();
+}
+
+function applyZoom() {
+  const canvases = document.querySelectorAll('#pdf-container canvas');
+  canvases.forEach(canvas => {
+    canvas.style.transform = `scale(${zoomScale})`;
+    canvas.style.transformOrigin = 'top center';
+  });
+
+  const userLayer = document.getElementById('user-layer');
+  if (userLayer) {
+    userLayer.style.transform = `scale(${zoomScale})`;
+    userLayer.style.transformOrigin = 'top center';
+  }
+}
+
+// === Missing Render All Pages ===
 async function renderAllPages() {
   const container = document.getElementById('pdf-viewer') || document.getElementById('pdf-container');
   container.innerHTML = '';
