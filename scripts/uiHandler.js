@@ -14,72 +14,83 @@ function createTextBox() {
   textBox.style.top = `${lastClick.y}px`;
   textBox.style.left = `${lastClick.x}px`;
 
-  enableDragResize(textBox);
+  enableSmartDrag(textBox);
   document.getElementById('user-layer').appendChild(textBox);
   elements.push(textBox);
 
-  textBox.focus();
-  textBox.addEventListener('touchstart', () => textBox.focus());
-
+  setTimeout(() => {
+    textBox.focus();
+  }, 100); // slight delay for mobile keyboard
   saveState();
 }
 
-// Enable dragging and resizing of an element
-function enableDragResize(el) {
+// Smart Dragging and Editing
+function enableSmartDrag(el) {
+  let offsetX = 0;
+  let offsetY = 0;
+  let dragging = false;
+  let longPressTimer = null;
+
   el.style.position = 'absolute';
   el.style.userSelect = 'none';
   el.style.touchAction = 'none';
   el.style.zIndex = 1000;
 
-  let offsetX = 0;
-  let offsetY = 0;
-  let dragging = false;
+  el.addEventListener('mousedown', startHold);
+  el.addEventListener('touchstart', startHold);
 
-  el.addEventListener('mousedown', (e) => {
-    dragging = true;
-    offsetX = e.clientX - el.offsetLeft;
-    offsetY = e.clientY - el.offsetTop;
-    document.addEventListener('mousemove', mouseMove);
-    document.addEventListener('mouseup', mouseUp);
-  });
+  function startHold(e) {
+    e.preventDefault();
+    if (e.type === 'mousedown' && e.button !== 0) return;
 
-  el.addEventListener('touchstart', (e) => {
-    dragging = true;
-    const touch = e.touches[0];
-    offsetX = touch.clientX - el.offsetLeft;
-    offsetY = touch.clientY - el.offsetTop;
-    document.addEventListener('touchmove', touchMove);
-    document.addEventListener('touchend', touchEnd);
-  });
+    longPressTimer = setTimeout(() => {
+      dragging = true;
+      offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - el.offsetLeft;
+      offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - el.offsetTop;
+    }, 200); // 200ms long-press triggers drag
+  }
 
-  function mouseMove(e) {
+  el.addEventListener('mousemove', (e) => {
     if (dragging) {
-      el.style.left = `${e.clientX - offsetX}px`;
-      el.style.top = `${e.clientY - offsetY}px`;
+      el.style.left = `${(e.clientX - offsetX)}px`;
+      el.style.top = `${(e.clientY - offsetY)}px`;
     }
-  }
+  });
 
-  function mouseUp() {
-    dragging = false;
-    document.removeEventListener('mousemove', mouseMove);
-    document.removeEventListener('mouseup', mouseUp);
-    saveState();
-  }
-
-  function touchMove(e) {
-    if (dragging) {
+  el.addEventListener('touchmove', (e) => {
+    if (dragging && e.touches.length === 1) {
       const touch = e.touches[0];
-      el.style.left = `${touch.clientX - offsetX}px`;
-      el.style.top = `${touch.clientY - offsetY}px`;
+      el.style.left = `${(touch.clientX - offsetX)}px`;
+      el.style.top = `${(touch.clientY - offsetY)}px`;
+    }
+  });
+
+  el.addEventListener('mouseup', endHold);
+  el.addEventListener('touchend', endHold);
+
+  function endHold(e) {
+    clearTimeout(longPressTimer);
+    if (dragging) {
+      dragging = false;
+      saveState();
+    } else {
+      el.focus(); // Tap (not drag) = focus to edit
     }
   }
 
-  function touchEnd() {
-    dragging = false;
-    document.removeEventListener('touchmove', touchMove);
-    document.removeEventListener('touchend', touchEnd);
-    saveState();
-  }
+  el.addEventListener('click', () => {
+    el.focus();
+  });
+
+  el.addEventListener('focus', () => {
+    el.style.border = '2px solid #4f46e5';
+    el.style.background = 'rgba(255,255,255,0.95)';
+  });
+
+  el.addEventListener('blur', () => {
+    el.style.border = '2px dashed #6366f1';
+    el.style.background = 'rgba(255,255,255,0.7)';
+  });
 }
 
 // Undo last action
@@ -90,7 +101,7 @@ function undo() {
   }
 }
 
-// Redo is skipped for now (optional for future)
+// Redo is skipped for now (optional future feature)
 function redo() {
   alert('Redo coming soon!');
 }
@@ -123,7 +134,7 @@ function restoreState(state) {
       el.contentEditable = true;
       el.innerText = item.content;
       Object.assign(el.style, item.style);
-      enableDragResize(el);
+      enableSmartDrag(el);
       layer.appendChild(el);
       elements.push(el);
     }
