@@ -1,19 +1,13 @@
 /* === styles.css === */
 
-/* Base Reset */
+/* General Body */
 body {
   margin: 0;
-  font-family: 'Poppins', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', 'Inter', 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #eef2ff, #e0e7ff);
   color: #111827;
   min-height: 100vh;
   overflow-x: hidden;
-}
-
-/* Landing & Editor shared header styles */
-h1, h2, h3, p {
-  margin: 0;
-  padding: 0;
 }
 
 /* Toolbar */
@@ -26,218 +20,142 @@ h1, h2, h3, p {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  justify-content: center;
   position: sticky;
   top: 0;
   z-index: 1000;
+  justify-content: center;
 }
 
-#toolbar button {
+/* Buttons and Inputs */
+#toolbar input[type="file"],
+#toolbar button,
+#toolbar select,
+#toolbar input[type="color"] {
   padding: 12px 20px;
-  font-size: 24px;
-  background: linear-gradient(145deg, #ffffff, #f3f4f6);
+  font-size: 16px;
   border: none;
   border-radius: 9999px;
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-#toolbar button:hover {
+#toolbar button:hover,
+#toolbar select:hover,
+#toolbar input[type="color"]:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 6px 12px rgba(99, 102, 241, 0.5);
+  background: linear-gradient(145deg, #e0e7ff, #c7d2fe);
 }
 
-/* PDF Viewer */
+/* Help Modal */
+#help-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+#help-modal .modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center; /* 🛠 center the help text */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* PDF Container */
 #pdf-container {
   position: relative;
   height: calc(100vh - 120px);
   overflow: auto;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  align-items: center; /* 🛠 center canvases vertically */
   padding: 30px;
 }
 
-canvas {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  border-radius: 20px;
+/* Center Canvases */
+#pdf-container canvas {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
   background: #ffffff;
+  margin-bottom: 20px;
 }
 
-/* Textbox + Signature Styles */
-.text-box {
+/* Textboxes and Signatures */
+.text-box, .signature-wrapper {
   position: absolute;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
   border: 2px dashed #6366f1;
-  border-radius: 12px;
-  resize: both;
-  overflow: auto;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   cursor: move;
-  padding: 8px;
+  user-select: none;
   min-width: 60px;
   min-height: 24px;
-  transition: all 0.3s ease;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.text-box:not(.editing) {
-  border: none;
-  resize: none;
-}
-
-.signature-wrapper {
-  position: absolute;
-  background: transparent;
-  border: 2px dashed #6366f1;
-  border-radius: 12px;
-  resize: both;
-  overflow: auto;
-  cursor: move;
-  padding: 4px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.signature-wrapper img {
+.text-box[contenteditable="true"]:focus {
+  outline: none;
+  border: 2px solid #4f46e5;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Signature Image */
+.signature-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
 }
 
-/* Landing Page */
-#landing-main {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  text-align: center;
-}
-
-/* Hero Title */
-.landing-title {
-  font-size: 48px;
-  color: #4f46e5;
-  margin-bottom: 12px;
-}
-
-/* Hero Subtitle */
-.landing-subtitle {
-  font-size: 18px;
-  color: #6b7280;
-  margin-bottom: 32px;
-}
-
-/* Upload & Help Buttons */
-.primary-btn, .secondary-btn {
-  padding: 14px 30px;
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 8px;
-}
-
-.primary-btn {
-  background: linear-gradient(145deg, #6366f1, #4f46e5);
-  color: white;
-}
-
-.primary-btn:hover {
-  background: linear-gradient(145deg, #4f46e5, #6366f1);
-  transform: scale(1.05);
-}
-
-.secondary-btn {
-  background: #f9fafb;
-  color: #4f46e5;
-  border: 2px solid #4f46e5;
-}
-
-.secondary-btn:hover {
-  background: #e0e7ff;
-}
-
-/* Recent Files */
-.recent-title {
-  margin-top: 48px;
-  font-size: 24px;
-  color: #374151;
-}
-
-.recent-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 16px;
-}
-
-.recent-list li {
-  background: #f9fafb;
-  padding: 12px 18px;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.recent-list li:hover {
-  background: #e0e7ff;
-  color: #4f46e5;
-}
-
-/* Modal (Help) */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background: white;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 16px;
-  max-width: 500px;
-  position: relative;
-}
-
-#close-help, #close-modal {
+/* Delete Button */
+.delete-btn {
   position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 28px;
-  color: #6366f1;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
   cursor: pointer;
-}
-
-.help-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-
-.help-list li {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  transition: background-color 0.3s;
 }
 
-/* Mobile */
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
   #toolbar {
     flex-direction: column;
+    gap: 10px;
     padding: 16px;
   }
 
