@@ -1,5 +1,5 @@
 // === app.js ===
-// Main Entry Point
+// Main App Logic
 
 document.addEventListener('DOMContentLoaded', () => {
   const isLandingPage = document.getElementById('landing-main') !== null;
@@ -31,10 +31,6 @@ function setupLandingPage() {
         window.location.href = 'editor.html';
       };
 
-      reader.onerror = function() {
-        alert('Error reading file.');
-      };
-
       reader.readAsDataURL(file);
     }
   });
@@ -48,15 +44,13 @@ function setupLandingPage() {
   });
 }
 
-// Save file into recent list
 function updateRecentFiles(filename, data) {
   let files = JSON.parse(localStorage.getItem('recentFiles')) || [];
   files.unshift({ name: filename, data: data });
-  files = files.slice(0, 5); // Keep latest 5
+  files = files.slice(0, 5);
   localStorage.setItem('recentFiles', JSON.stringify(files));
 }
 
-// Load recent files
 function loadRecentFiles() {
   const list = document.getElementById('recent-list');
   if (!list) return;
@@ -64,7 +58,7 @@ function loadRecentFiles() {
   list.innerHTML = '';
   const files = JSON.parse(localStorage.getItem('recentFiles')) || [];
 
-  files.forEach((file, index) => {
+  files.forEach(file => {
     const li = document.createElement('li');
     li.textContent = file.name;
     li.addEventListener('click', () => {
@@ -75,7 +69,6 @@ function loadRecentFiles() {
   });
 }
 
-// Help Modal Toggle
 function toggleHelpModal(show) {
   const modal = document.getElementById('help-modal');
   if (modal) {
@@ -90,7 +83,6 @@ function setupEditorPage() {
   bindHelpModal();
 }
 
-// Toolbar button actions
 function bindToolbarActions() {
   document.querySelectorAll('.toolbar-btn').forEach(button => {
     button.addEventListener('click', () => {
@@ -100,7 +92,6 @@ function bindToolbarActions() {
   });
 }
 
-// Handle toolbar logic
 function handleToolbarAction(action) {
   switch (action) {
     case 'Upload PDF':
@@ -133,7 +124,6 @@ function handleToolbarAction(action) {
   }
 }
 
-// Help Modal binding
 function bindHelpModal() {
   const helpBtn = document.getElementById('help-btn');
   const closeHelp = document.getElementById('close-help');
@@ -145,7 +135,6 @@ function bindHelpModal() {
   }
 }
 
-// Load stored file
 function loadStoredOrPromptFile() {
   const base64Data = sessionStorage.getItem('uploadedPDF');
 
