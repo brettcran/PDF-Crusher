@@ -1,58 +1,58 @@
-// === pdfHandler.js ===
-// Handle PDF saving correctly
+// scripts/pdfHandler.js
 
-async function savePDF() {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p', 'pt', 'a4');
-  const canvases = document.querySelectorAll('#pdf-container canvas');
+let pdfDoc = null;
+let scale = 1.0;
 
-  const userLayer = document.getElementById('user-layer');
-  const userItems = userLayer ? Array.from(userLayer.children) : [];
-
-  const pdfWidth = 595.28; // A4 width in pt
-  const pdfHeight = 841.89; // A4 height in pt
-
-  for (let i = 0; i < canvases.length; i++) {
-    const canvas = canvases[i];
-    const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
-    // Draw the original PDF page
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-    // Draw textboxes and signatures for this page
-    userItems.forEach(item => {
-      const rect = item.getBoundingClientRect();
-      const canvasRect = canvas.getBoundingClientRect();
-
-      const offsetX = rect.left - canvasRect.left;
-      const offsetY = rect.top - canvasRect.top;
-
-      if (offsetX >= 0 && offsetY >= 0 &&
-          offsetX <= canvasRect.width && offsetY <= canvasRect.height) {
-
-        if (item.classList.contains('text-box')) {
-          pdf.setFontSize(16);
-          pdf.setTextColor(0, 0, 0);
-          pdf.text(item.innerText || '', (offsetX / canvasRect.width) * pdfWidth, (offsetY / canvasRect.height) * pdfHeight);
-        }
-
-        if (item.classList.contains('signature-wrapper')) {
-          const img = item.querySelector('img');
-          if (img) {
-            const imgWidth = (rect.width / canvasRect.width) * pdfWidth;
-            const imgHeight = (rect.height / canvasRect.height) * pdfHeight;
-            pdf.addImage(img.src, 'PNG', (offsetX / canvasRect.width) * pdfWidth, (offsetY / canvasRect.height) * pdfHeight, imgWidth, imgHeight);
-          }
-        }
-      }
-    });
-
-    // Add page if not last page
-    if (i < canvases.length - 1) {
-      pdf.addPage();
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('pdfData')) {
+    loadPDF(sessionStorage.getItem('pdfData'));
   }
+});
 
-  const filename = localStorage.getItem('currentFile') || 'document.pdf';
-  pdf.save(filename);
+function loadPDF(data) {
+  const loadingTask = pdfjsLib.getDocument({ data: atob(data.split(',')[1]) });
+  loadingTask.promise.then((doc) => {
+    pdfDoc = doc;
+    renderAllPages();
+  });
+}
+
+function renderAllPages() {
+  const container = document.getElementById('pdf-container');
+  container.innerHTML = '';
+  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+    pdfDoc.getPage(pageNum).then(page => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const viewport = page.getViewport({ scale });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      page.render({ canvasContext: context, viewport: viewport });
+      container.appendChild(canvas);
+    });
+  }
+}
+
+function zoomIn() {
+  scale += 0.1;
+  renderAllPages();
+}
+
+function zoomOut() {
+  scale = Math.max(0.5, scale - 0.1);
+  renderAllPages();
+}
+
+function savePDF() {
+  const container = document.getElementById('pdf-container');
+  html2canvas(container, { backgroundColor: '#ffffff' }).then((canvas) => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF();
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('pdf-crusher-edited.pdf');
+  });
 }
