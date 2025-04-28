@@ -1,43 +1,58 @@
 // === pdfHandler.js ===
-// Handle PDF Saving with overlays
+// Handle PDF saving correctly
 
 async function savePDF() {
-  const viewer = document.getElementById('pdf-viewer');
-  const userLayer = document.getElementById('user-layer');
-
-  // Clone current canvas with text/signatures overlaid
-  const combined = document.createElement('div');
-  combined.style.position = 'relative';
-  combined.style.width = `${viewer.offsetWidth}px`;
-  combined.style.height = `${viewer.offsetHeight}px`;
-
-  const pdfCanvas = viewer.querySelector('canvas');
-  const userLayerClone = userLayer.cloneNode(true);
-
-  pdfCanvas.style.position = 'absolute';
-  pdfCanvas.style.top = '0';
-  pdfCanvas.style.left = '0';
-  combined.appendChild(pdfCanvas.cloneNode(true));
-
-  userLayerClone.querySelectorAll('.text-box, .signature-wrapper').forEach(box => {
-    box.style.position = 'absolute';
-    box.style.background = 'transparent';
-    combined.appendChild(box.cloneNode(true));
-  });
-
-  const canvas = await html2canvas(combined, { backgroundColor: null });
-  const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('portrait', 'pt', [canvas.width, canvas.height]);
-  pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+  const pdf = new jsPDF('p', 'pt', 'a4');
+  const canvases = document.querySelectorAll('#pdf-container canvas');
 
-  // Use stored filename if available
-  const filename = localStorage.getItem('currentFile') || 'edited.pdf';
+  const userLayer = document.getElementById('user-layer');
+  const userItems = userLayer ? Array.from(userLayer.children) : [];
+
+  const pdfWidth = 595.28; // A4 width in pt
+  const pdfHeight = 841.89; // A4 height in pt
+
+  for (let i = 0; i < canvases.length; i++) {
+    const canvas = canvases[i];
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+    // Draw the original PDF page
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+    // Draw textboxes and signatures for this page
+    userItems.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+
+      const offsetX = rect.left - canvasRect.left;
+      const offsetY = rect.top - canvasRect.top;
+
+      if (offsetX >= 0 && offsetY >= 0 &&
+          offsetX <= canvasRect.width && offsetY <= canvasRect.height) {
+
+        if (item.classList.contains('text-box')) {
+          pdf.setFontSize(16);
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(item.innerText || '', (offsetX / canvasRect.width) * pdfWidth, (offsetY / canvasRect.height) * pdfHeight);
+        }
+
+        if (item.classList.contains('signature-wrapper')) {
+          const img = item.querySelector('img');
+          if (img) {
+            const imgWidth = (rect.width / canvasRect.width) * pdfWidth;
+            const imgHeight = (rect.height / canvasRect.height) * pdfHeight;
+            pdf.addImage(img.src, 'PNG', (offsetX / canvasRect.width) * pdfWidth, (offsetY / canvasRect.height) * pdfHeight, imgWidth, imgHeight);
+          }
+        }
+      }
+    });
+
+    // Add page if not last page
+    if (i < canvases.length - 1) {
+      pdf.addPage();
+    }
+  }
+
+  const filename = localStorage.getItem('currentFile') || 'document.pdf';
   pdf.save(filename);
-
-  // After save, redirect to landing page
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 500);
 }
