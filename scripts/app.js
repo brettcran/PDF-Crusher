@@ -1,5 +1,5 @@
 // === app.js ===
-// Main App Logic
+// Main App Controller
 
 document.addEventListener('DOMContentLoaded', () => {
   const isLandingPage = document.getElementById('landing-main') !== null;
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// === Landing Page Functions ===
+// === Landing Page Logic ===
 function setupLandingPage() {
   loadRecentFiles();
 
@@ -76,7 +76,7 @@ function toggleHelpModal(show) {
   }
 }
 
-// === Editor Page Functions ===
+// === Editor Page Logic ===
 function setupEditorPage() {
   bindToolbarActions();
   loadStoredOrPromptFile();
