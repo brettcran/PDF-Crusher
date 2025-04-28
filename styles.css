@@ -35,38 +35,6 @@ h1, h2, h3, p {
   padding: 0;
 }
 
-.primary-btn {
-  padding: 12px 24px;
-  font-size: 18px;
-  border: none;
-  border-radius: 9999px;
-  background: linear-gradient(145deg, #4f46e5, #6366f1);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-  transition: all 0.3s ease;
-}
-
-.primary-btn:hover {
-  background: linear-gradient(145deg, #6366f1, #4f46e5);
-  transform: translateY(-2px) scale(1.03);
-}
-
-.secondary-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #e0e7ff;
-  border: none;
-  border-radius: 9999px;
-  color: #4f46e5;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.secondary-btn:hover {
-  background: #c7d2fe;
-}
-
 /* === 3. Toolbar Styles === */
 #toolbar {
   display: flex;
@@ -92,7 +60,7 @@ h1, h2, h3, p {
   border: none;
   border-radius: 9999px;
   background: linear-gradient(145deg, #ffffff, #f3f4f6);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -112,3 +80,193 @@ h1, h2, h3, p {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  padding: 30px;
+}
+
+canvas {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+/* === 5. User Layer (Text Boxes, Signatures) === */
+.text-box {
+  position: absolute;
+  background: transparent;
+  border: 2px dashed #6366f1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  user-select: none;
+  min-width: 60px;
+  min-height: 24px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.text-box[contenteditable="true"]:focus {
+  outline: none;
+  border: 2px solid #4f46e5;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.signature-wrapper {
+  position: absolute;
+  background: transparent;
+  border: 2px dashed #6366f1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  user-select: none;
+  padding: 4px;
+  transition: all 0.3s ease;
+}
+
+.signature-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* === 6. Landing Page (Hero, Upload, Recent Files) === */
+#landing-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.landing-title {
+  font-size: 48px;
+  color: #4f46e5;
+  margin-bottom: 12px;
+}
+
+.landing-subtitle {
+  font-size: 18px;
+  color: #6b7280;
+  margin-bottom: 32px;
+}
+
+.recent-title {
+  margin-top: 48px;
+  font-size: 24px;
+  color: #374151;
+}
+
+.recent-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 16px;
+}
+
+.recent-list li {
+  background: #f9fafb;
+  padding: 12px 18px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.recent-list li:hover {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+/* === 7. Help Modal Styling === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background: white;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 500px;
+  position: relative;
+}
+
+#close-help, #close-modal {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  color: #6366f1;
+  cursor: pointer;
+}
+
+.help-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.help-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.help-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+}
+
+/* === 8. Save Button Hero Style === */
+.save-btn-container {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.hero-save-btn {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(145deg, #4f46e5, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  transition: all 0.4s ease;
+}
+
+.hero-save-btn:hover {
+  background: linear-gradient(145deg, #6366f1, #4f46e5);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
+}
+
+/* === 9. Responsive Media Queries === */
+@media (max-width: 768px) {
+  #toolbar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  #pdf-container {
+    padding: 16px;
+  }
+}
