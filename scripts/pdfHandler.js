@@ -46,13 +46,21 @@ function zoomOut() {
 
 function savePDF() {
   const container = document.getElementById('pdf-container');
-  html2canvas(container, { backgroundColor: '#ffffff' }).then((canvas) => {
+  const canvases = container.querySelectorAll('canvas');
+  const pdf = new jspdf.jsPDF();
+
+  canvases.forEach((canvas, index) => {
     const imgData = canvas.toDataURL('image/png');
-    const pdf = new jspdf.jsPDF();
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    if (index !== 0) {
+      pdf.addPage();
+    }
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save('pdf-crusher-edited.pdf');
   });
+
+  let originalName = sessionStorage.getItem('pdfName') || 'document.pdf'; // ✅ Keep the real original file name
+  pdf.save(originalName);
 }
