@@ -34,6 +34,7 @@ function handleFileUpload(e) {
     const reader = new FileReader();
     reader.onload = (event) => {
       sessionStorage.setItem('pdfData', event.target.result);
+      sessionStorage.setItem('pdfName', file.name); // ✅ Save the original filename
       window.location.href = 'editor.html';
     };
     reader.readAsDataURL(file);
