@@ -1,11 +1,14 @@
 // scripts/app.js
 
+let lastClick = { x: 100, y: 100 };
+
 document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById('file-input') || document.getElementById('upload-btn');
   const helpBtn = document.getElementById('help-btn');
   const closeHelp = document.getElementById('close-help');
-  const toolbar = document.getElementById('toolbar');
   const closeSignature = document.getElementById('close-signature');
+  const toolbar = document.getElementById('toolbar');
+  const pdfContainer = document.getElementById('pdf-container');
 
   if (fileInput && fileInput.tagName === "INPUT") {
     fileInput.addEventListener('change', handleFileUpload);
@@ -36,6 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.id) {
         handleToolbarAction(e.target.id);
       }
+    });
+  }
+
+  if (pdfContainer) {
+    pdfContainer.addEventListener('click', (e) => {
+      lastClick = { x: e.offsetX, y: e.offsetY };
     });
   }
 });
@@ -72,7 +81,7 @@ function handleToolbarAction(action) {
       savePDF();
       break;
     case "text-btn":
-      createTextBox();
+      createTextBoxAt(lastClick.x, lastClick.y);
       break;
     case "sign-btn":
       openSignatureModal();
