@@ -1,81 +1,59 @@
-// === signatureHandler.js ===
-// Handle signatures saving, loading, inserting
+// scripts/signatureHandler.js
 
 let signaturePad;
-let savedSignatures = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saveSignatureBtn = document.getElementById('save-signature');
+  const clearSignatureBtn = document.getElementById('clear-signature');
+  const closeSignatureBtn = document.getElementById('close-signature');
+
+  if (saveSignatureBtn) {
+    saveSignatureBtn.addEventListener('click', saveSignature);
+  }
+  if (clearSignatureBtn) {
+    clearSignatureBtn.addEventListener('click', () => signaturePad.clear());
+  }
+  if (closeSignatureBtn) {
+    closeSignatureModal();
+  }
+});
 
 function openSignatureModal() {
-  const modal = document.getElementById('signature-modal');
-  if (modal) {
-    modal.style.display = 'block';
-  }
+  document.getElementById('signature-modal').style.display = 'flex';
   const canvas = document.getElementById('signature-pad');
   signaturePad = new SignaturePad(canvas);
-  loadSavedSignatures();
 }
 
 function closeSignatureModal() {
-  const modal = document.getElementById('signature-modal');
-  if (modal) {
-    modal.style.display = 'none';
+  document.getElementById('signature-modal').style.display = 'none';
+}
+
+function saveSignature() {
+  if (signaturePad.isEmpty()) {
+    alert("Please draw a signature first.");
+    return;
   }
-}
-
-const closeModalBtn = document.getElementById('close-modal');
-if (closeModalBtn) {
-  closeModalBtn.addEventListener('click', closeSignatureModal);
-}
-
-document.getElementById('clear-signature')?.addEventListener('click', () => {
-  signaturePad?.clear();
-});
-
-document.getElementById('save-signature')?.addEventListener('click', () => {
-  if (!signaturePad?.isEmpty()) {
-    const dataURL = signaturePad.toDataURL();
-    savedSignatures.push(dataURL);
-    localStorage.setItem('savedSignatures', JSON.stringify(savedSignatures));
-    loadSavedSignatures();
-    signaturePad.clear();
-  }
-});
-
-function loadSavedSignatures() {
-  const container = document.getElementById('saved-signatures');
-  if (!container) return;
-  container.innerHTML = '';
-  savedSignatures = JSON.parse(localStorage.getItem('savedSignatures')) || [];
-
-  savedSignatures.forEach((sig) => {
-    const img = document.createElement('img');
-    img.src = sig;
-    img.style.width = '100px';
-    img.style.margin = '5px';
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', () => {
-      insertSignature(sig);
-      closeSignatureModal();
-    });
-    container.appendChild(img);
-  });
-}
-
-function insertSignature(imageSrc) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'signature-wrapper';
-  wrapper.style.left = `${lastClick.x}px`;
-  wrapper.style.top = `${lastClick.y}px`;
-
+  const dataURL = signaturePad.toDataURL();
   const img = document.createElement('img');
-  img.src = imageSrc;
+  img.src = dataURL;
   img.className = 'signature-image';
+  img.style.position = 'absolute';
+  img.style.top = '100px';
+  img.style.left = '100px';
+  img.style.width = '150px';
+  img.style.height = '60px';
+  img.style.cursor = 'move';
+  img.draggable = true;
+  document.getElementById('pdf-container').appendChild(img);
 
-  wrapper.appendChild(img);
-  wrapper.addEventListener('mousedown', startDrag);
-  wrapper.style.resize = 'both';
-  wrapper.style.overflow = 'auto';
-  wrapper.style.pointerEvents = 'auto';
+  img.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', '');
+  });
 
-  document.getElementById('user-layer').appendChild(wrapper);
-  saveHistory();
+  img.addEventListener('dragend', (e) => {
+    img.style.left = `${e.pageX - 75}px`;
+    img.style.top = `${e.pageY - 30}px`;
+  });
+
+  closeSignatureModal();
 }
