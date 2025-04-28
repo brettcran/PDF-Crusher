@@ -1,5 +1,5 @@
 // === app.js ===
-// Main Entry Point Script
+// Main Entry Point
 
 document.addEventListener('DOMContentLoaded', () => {
   const isLandingPage = document.getElementById('landing-main') !== null;
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Landing Page Setup
+// === Landing Page Functions ===
 function setupLandingPage() {
   loadRecentFiles();
 
@@ -27,7 +27,7 @@ function setupLandingPage() {
       reader.onload = function(event) {
         sessionStorage.setItem('uploadedPDF', event.target.result);
         localStorage.setItem('currentFile', file.name);
-        updateRecentFiles(file.name);
+        updateRecentFiles(file.name, event.target.result);
         window.location.href = 'editor.html';
       };
 
@@ -48,11 +48,31 @@ function setupLandingPage() {
   });
 }
 
-// Editor Page Setup
-function setupEditorPage() {
-  bindToolbarActions();
-  loadStoredOrPromptFile();
-  bindHelpModal();
+// Save file into recent list
+function updateRecentFiles(filename, data) {
+  let files = JSON.parse(localStorage.getItem('recentFiles')) || [];
+  files.unshift({ name: filename, data: data });
+  files = files.slice(0, 5); // Keep latest 5
+  localStorage.setItem('recentFiles', JSON.stringify(files));
+}
+
+// Load recent files
+function loadRecentFiles() {
+  const list = document.getElementById('recent-list');
+  if (!list) return;
+
+  list.innerHTML = '';
+  const files = JSON.parse(localStorage.getItem('recentFiles')) || [];
+
+  files.forEach((file, index) => {
+    const li = document.createElement('li');
+    li.textContent = file.name;
+    li.addEventListener('click', () => {
+      sessionStorage.setItem('uploadedPDF', file.data);
+      window.location.href = 'editor.html';
+    });
+    list.appendChild(li);
+  });
 }
 
 // Help Modal Toggle
@@ -63,7 +83,14 @@ function toggleHelpModal(show) {
   }
 }
 
-// Bind Toolbar Button Actions
+// === Editor Page Functions ===
+function setupEditorPage() {
+  bindToolbarActions();
+  loadStoredOrPromptFile();
+  bindHelpModal();
+}
+
+// Toolbar button actions
 function bindToolbarActions() {
   document.querySelectorAll('.toolbar-btn').forEach(button => {
     button.addEventListener('click', () => {
@@ -73,19 +100,7 @@ function bindToolbarActions() {
   });
 }
 
-// Help Modal on Editor
-function bindHelpModal() {
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const closeHelp = document.getElementById('close-help');
-
-  if (helpBtn && helpModal && closeHelp) {
-    helpBtn.addEventListener('click', () => toggleHelpModal(true));
-    closeHelp.addEventListener('click', () => toggleHelpModal(false));
-  }
-}
-
-// Handle Toolbar Actions
+// Handle toolbar logic
 function handleToolbarAction(action) {
   switch (action) {
     case 'Upload PDF':
@@ -118,7 +133,19 @@ function handleToolbarAction(action) {
   }
 }
 
-// Load Stored File from sessionStorage or fallback
+// Help Modal binding
+function bindHelpModal() {
+  const helpBtn = document.getElementById('help-btn');
+  const closeHelp = document.getElementById('close-help');
+  const modal = document.getElementById('help-modal');
+
+  if (helpBtn && closeHelp && modal) {
+    helpBtn.addEventListener('click', () => toggleHelpModal(true));
+    closeHelp.addEventListener('click', () => toggleHelpModal(false));
+  }
+}
+
+// Load stored file
 function loadStoredOrPromptFile() {
   const base64Data = sessionStorage.getItem('uploadedPDF');
 
@@ -135,6 +162,6 @@ function loadStoredOrPromptFile() {
         alert('Failed to load PDF.');
       });
   } else {
-    document.getElementById('file-input').click(); // fallback
+    document.getElementById('file-input').click();
   }
 }
