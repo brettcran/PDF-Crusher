@@ -1,5 +1,25 @@
-/* === Luxury SaaS Styles.css === */
+/*
+===========================================
+ PDF Crusher - Luxury SaaS Styles.css
+ Author: PDF Crusher Team
+ Last Updated: 2025-04-27
+===========================================
 
+ TABLE OF CONTENTS
+ -----------------
+ 1. Base Reset
+ 2. Typography and Colors
+ 3. Toolbar Styles
+ 4. PDF Viewer Layout
+ 5. User Layer (Text Boxes, Signatures)
+ 6. Landing Page (Hero, Upload, Recent Files)
+ 7. Help Modal Styling
+ 8. Save Button Hero Style
+ 9. Responsive Media Queries
+===========================================
+*/
+
+/* === 1. Base Reset === */
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -9,6 +29,45 @@ body {
   overflow-x: hidden;
 }
 
+/* === 2. Typography and Colors === */
+h1, h2, h3, p {
+  margin: 0;
+  padding: 0;
+}
+
+.primary-btn {
+  padding: 12px 24px;
+  font-size: 18px;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, #4f46e5, #6366f1);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(145deg, #6366f1, #4f46e5);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.secondary-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #e0e7ff;
+  border: none;
+  border-radius: 9999px;
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secondary-btn:hover {
+  background: #c7d2fe;
+}
+
+/* === 3. Toolbar Styles === */
 #toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -43,24 +102,9 @@ body {
 #toolbar input[type="color"]:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 6px 12px rgba(99, 102, 241, 0.5);
-  background: linear-gradient(145deg, #e0e7ff, #c7d2fe);
 }
 
-#install-banner {
-  display: none;
-  background: #6366f1;
-  color: white;
-  padding: 12px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-#install-banner:hover {
-  background: #4f46e5;
-}
-
+/* === 4. PDF Viewer Layout === */
 #pdf-container {
   position: relative;
   height: calc(100vh - 120px);
@@ -68,118 +112,3 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-  padding: 30px;
-}
-
-canvas {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  border-radius: 20px;
-  background: #ffffff;
-}
-
-.text-box {
-  position: absolute;
-  background: transparent; /* Fix: fully transparent by default */
-  backdrop-filter: none;
-  border: 2px dashed #6366f1;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  cursor: move;
-  user-select: none;
-  min-width: 60px;
-  min-height: 24px;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.text-box[contenteditable="true"]:focus {
-  outline: none;
-  border: 2px solid #4f46e5;
-  background: rgba(255, 255, 255, 0.8); /* Focus = light white */
-}
-
-.signature-wrapper {
-  position: absolute;
-  background: transparent;
-  border: 2px dashed #6366f1;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  cursor: move;
-  user-select: none;
-  padding: 4px;
-  transition: all 0.3s ease;
-}
-
-.signature-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.delete-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 24px;
-  height: 24px;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.delete-btn:hover {
-  background: #dc2626;
-  transform: scale(1.1);
-}
-
-/* Save Button Floating */
-.save-btn-container {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.hero-save-btn {
-  padding: 16px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  background: linear-gradient(145deg, #4f46e5, #6366f1);
-  color: white;
-  border: none;
-  border-radius: 9999px;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-  transition: all 0.4s ease;
-}
-
-.hero-save-btn:hover {
-  background: linear-gradient(145deg, #6366f1, #4f46e5);
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
-}
-
-@media (max-width: 768px) {
-  #toolbar {
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px;
-  }
-
-  #pdf-container {
-    padding: 16px;
-  }
-}
