@@ -1,37 +1,49 @@
 // scripts/uiHandler.js
 
 function createTextBox() {
-  const div = document.createElement('div');
-  div.contentEditable = true;
-  div.className = 'text-box';
-  div.style.position = 'absolute';
-  div.style.top = '150px';
-  div.style.left = '100px';
-  div.style.minWidth = '100px';
-  div.style.minHeight = '30px';
-  div.style.background = 'transparent';
-  div.style.color = '#111827';
-  div.style.fontSize = '16px';
-  div.style.border = '1px dashed #4f46e5';
-  div.style.padding = '4px 8px';
-  div.style.borderRadius = '8px';
-  div.style.cursor = 'move';
-  document.getElementById('pdf-container').appendChild(div);
+  const textBox = document.createElement('div');
+  textBox.className = 'text-box';
+  textBox.contentEditable = true;
+  textBox.style.position = 'absolute';
+  textBox.style.top = '100px';
+  textBox.style.left = '100px';
+  textBox.style.minWidth = '100px';
+  textBox.style.minHeight = '30px';
+  textBox.style.padding = '6px 10px';
+  textBox.style.border = '1px dashed #6366f1';
+  textBox.style.borderRadius = '8px';
+  textBox.style.background = 'transparent';
+  textBox.style.color = '#111827';
+  textBox.style.fontSize = '16px';
+  textBox.style.cursor = 'move';
+  textBox.draggable = true;
 
-  div.draggable = true;
-  div.addEventListener('dragstart', (e) => {
+  document.getElementById('pdf-container').appendChild(textBox);
+
+  textBox.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', '');
   });
-  div.addEventListener('dragend', (e) => {
-    div.style.left = `${e.pageX - 50}px`;
-    div.style.top = `${e.pageY - 15}px`;
+
+  textBox.addEventListener('dragend', (e) => {
+    textBox.style.left = `${e.pageX - 50}px`;
+    textBox.style.top = `${e.pageY - 15}px`;
+  });
+
+  textBox.addEventListener('focusout', () => {
+    textBox.style.border = 'none'; // Remove dashed border when not focused
+  });
+
+  textBox.addEventListener('focus', () => {
+    textBox.style.border = '1px dashed #6366f1'; // Show border again when focused
   });
 }
 
 function undo() {
-  // Optional: To implement if undo/redo flow needed
+  // TODO: Real undo system if needed
+  alert('Undo not implemented yet.');
 }
 
 function redo() {
-  // Optional: To implement if undo/redo flow needed
+  // TODO: Real redo system if needed
+  alert('Redo not implemented yet.');
 }
