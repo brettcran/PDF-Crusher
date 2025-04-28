@@ -45,6 +45,8 @@ function zoomOut() {
 }
 
 function savePDF() {
-  // Implement PDF saving logic here
-  // This could involve using pdf-lib or another library to reconstruct and download the PDF
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('application/pdf');
+  link.download = pdfName;
+  link.click();
 }

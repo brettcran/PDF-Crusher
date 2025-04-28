@@ -2,6 +2,15 @@
 
 let signaturePad;
 
+function openSignatureModal() {
+  document.getElementById('signature-modal').style.display = 'flex';
+  const canvas = document.getElementById('signature-pad');
+  signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'white',
+    penColor: 'black'
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const saveSignatureBtn = document.getElementById('save-signature');
   const clearSignatureBtn = document.getElementById('clear-signature');
@@ -19,15 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-function openSignatureModal() {
-  document.getElementById('signature-modal').style.display = 'flex';
-  const canvas = document.getElementById('signature-pad');
-  signaturePad = new SignaturePad(canvas, {
-    backgroundColor: 'white',
-    penColor: 'black'
-  });
-}
 
 function saveSignature() {
   if (signaturePad.isEmpty()) {

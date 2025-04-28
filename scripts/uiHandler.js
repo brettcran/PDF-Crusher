@@ -30,20 +30,18 @@ function createTextBox() {
   });
 
   textBox.addEventListener('focusout', () => {
-    textBox.style.border = 'none'; // Remove dashed border when not focused
+    textBox.style.border = 'none';
   });
 
   textBox.addEventListener('focus', () => {
-    textBox.style.border = '1px dashed #6366f1'; // Show border again when focused
+    textBox.style.border = '1px dashed #6366f1';
   });
 }
 
 function undo() {
-  // TODO: Real undo system if needed
   alert('Undo not implemented yet.');
 }
 
 function redo() {
-  // TODO: Real redo system if needed
   alert('Redo not implemented yet.');
 }
