@@ -1,15 +1,12 @@
 // scripts/pdfHandler.js
 
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
 let pdfDoc = null;
 let currentPage = 1;
 let scale = 1.0;
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
 const container = document.getElementById('pdf-container');
-
-if (container) {
-  container.appendChild(canvas);
-}
+const pageCanvases = [];
 
 const pdfData = sessionStorage.getItem('pdfData');
 const pdfName = sessionStorage.getItem('pdfName') || 'document.pdf';
@@ -22,83 +19,75 @@ function loadPDF() {
   const loadingTask = pdfjsLib.getDocument({ data: atob(pdfData.split(',')[1]) });
   loadingTask.promise.then(function (pdf) {
     pdfDoc = pdf;
-    renderPage(currentPage);
+    renderAllPages();
   });
 }
 
-function renderPage(num) {
-  pdfDoc.getPage(num).then(function (page) {
-    const viewport = page.getViewport({ scale: scale });
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    centerCanvas();
+function renderAllPages() {
+  container.innerHTML = '';
+  pageCanvases.length = 0;
 
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
-    };
-    page.render(renderContext);
-  });
-}
+  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+    pdfDoc.getPage(pageNum).then(function (page) {
+      const viewport = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-function zoomIn() {
-  scale += 0.1;
-  renderPage(currentPage);
-}
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      canvas.style.display = 'block';
+      canvas.style.margin = '20px auto';
 
-function zoomOut() {
-  if (scale > 0.2) {
-    scale -= 0.1;
-    renderPage(currentPage);
+      container.appendChild(canvas);
+      pageCanvases.push(canvas);
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      page.render(renderContext);
+    });
   }
 }
 
 function savePDF() {
-  const saveCanvas = document.createElement('canvas');
-  const saveCtx = saveCanvas.getContext('2d');
+  const pdf = new jspdf.jsPDF('p', 'px', 'a4');
+  
+  pageCanvases.forEach((canvas, index) => {
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const canvasAspect = canvas.width / canvas.height;
+    const pageAspect = pageWidth / pageHeight;
 
-  saveCanvas.width = canvas.width;
-  saveCanvas.height = canvas.height;
+    let renderWidth, renderHeight;
 
-  // Draw PDF
-  saveCtx.drawImage(canvas, 0, 0);
+    if (canvasAspect > pageAspect) {
+      renderWidth = pageWidth;
+      renderHeight = pageWidth / canvasAspect;
+    } else {
+      renderHeight = pageHeight;
+      renderWidth = pageHeight * canvasAspect;
+    }
 
-  // Draw all text boxes
-  const textBoxes = document.querySelectorAll('.text-box');
-  textBoxes.forEach(box => {
-    saveCtx.font = `${parseInt(box.style.fontSize) || 16}px Poppins, Inter, sans-serif`;
-    saveCtx.fillStyle = box.style.color || "#000";
-    const text = box.innerText.trim();
-    if (text) {
-      const rect = box.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const x = rect.left - containerRect.left;
-      const y = rect.top - containerRect.top + parseInt(box.style.fontSize || 16);
-      saveCtx.fillText(text, x, y);
+    pdf.addImage(imgData, 'JPEG', (pageWidth - renderWidth) / 2, (pageHeight - renderHeight) / 2, renderWidth, renderHeight);
+
+    if (index < pageCanvases.length - 1) {
+      pdf.addPage();
     }
   });
 
-  // Draw all signatures
-  const sigs = document.querySelectorAll('.signature-image');
-  sigs.forEach(img => {
-    const rect = img.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const x = rect.left - containerRect.left;
-    const y = rect.top - containerRect.top;
-    saveCtx.drawImage(img, x, y, img.width, img.height);
-  });
-
-  const link = document.createElement('a');
-  link.href = saveCanvas.toDataURL('application/pdf');
-  link.download = pdfName;
-  link.click();
+  pdf.save(pdfName);
 }
 
-function centerCanvas() {
-  canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
+function zoomIn() {
+  scale += 0.2;
+  renderAllPages();
 }
 
-window.addEventListener('resize', () => {
-  centerCanvas();
-});
+function zoomOut() {
+  if (scale > 0.4) {
+    scale -= 0.2;
+    renderAllPages();
+  }
+}
