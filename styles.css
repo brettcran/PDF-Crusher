@@ -1,4 +1,4 @@
-/* Global Styles */
+/* === Global Styles === */
 body {
   margin: 0;
   font-family: 'Poppins', 'Inter', sans-serif;
@@ -11,31 +11,51 @@ body {
   align-items: center;
 }
 
-/* Landing Page */
-.landing-container {
+/* === Landing & Editor Containers === */
+.landing-container, #editor-container {
   text-align: center;
   margin-top: 80px;
+  width: 100%;
 }
 
-.upload-btn {
+/* === Upload and Toolbar Buttons === */
+.upload-btn, .toolbar-btn {
   display: inline-block;
   padding: 12px 24px;
-  margin-top: 20px;
   font-size: 18px;
   border: none;
   border-radius: 9999px;
   background: linear-gradient(145deg, #6366f1, #4f46e5);
   color: white;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
-.upload-btn:hover {
+.upload-btn:hover, .toolbar-btn:hover {
   background: linear-gradient(145deg, #4f46e5, #6366f1);
+  transform: translateY(-2px) scale(1.03);
 }
 
+/* === Toolbar === */
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 0 0 16px 16px;
+}
+
+/* === Help Button === */
 .help-btn {
-  margin-top: 20px;
+  margin-top: 30px;
   font-size: 24px;
   background: none;
   border: none;
@@ -47,37 +67,7 @@ body {
   text-decoration: underline;
 }
 
-/* Toolbar */
-#toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  justify-content: center;
-}
-
-/* Toolbar Buttons */
-.toolbar-btn {
-  padding: 10px;
-  font-size: 20px;
-  background: #ffffff;
-  border: none;
-  border-radius: 9999px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.toolbar-btn:hover {
-  background: #e0e7ff;
-}
-
-/* PDF Container */
+/* === PDF Container === */
 #pdf-container {
   flex-grow: 1;
   padding: 20px;
@@ -92,12 +82,12 @@ canvas {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto;
+  margin: 20px auto;
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
 }
 
-/* Text Box */
+/* === Text Box (added text) === */
 .text-box {
   position: absolute;
   background: transparent;
@@ -110,6 +100,7 @@ canvas {
   color: #111827;
   cursor: move;
   overflow: hidden;
+  z-index: 10;
 }
 
 .text-box[contenteditable="true"]:focus {
@@ -117,13 +108,13 @@ canvas {
   border: 1px dashed #6366f1;
 }
 
-/* Signature Image */
+/* === Signature Image === */
 .signature-image {
   position: absolute;
   cursor: move;
 }
 
-/* Modals */
+/* === Modals === */
 .modal {
   display: none;
   position: fixed;
@@ -159,7 +150,7 @@ canvas {
   color: #000;
 }
 
-/* Help List */
+/* === Help List inside Modal === */
 .help-list {
   list-style: none;
   padding: 0;
@@ -177,7 +168,7 @@ canvas {
   justify-content: center;
 }
 
-/* Signature Modal */
+/* === Signature Modal === */
 #signature-pad {
   border-radius: 8px;
 }
@@ -188,11 +179,11 @@ canvas {
   justify-content: space-around;
 }
 
-/* Mobile Responsive */
+/* === Mobile Responsive === */
 @media (max-width: 768px) {
   #toolbar {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .modal-content {
