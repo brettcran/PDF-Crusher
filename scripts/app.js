@@ -36,8 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (toolbar) {
     toolbar.addEventListener('click', (e) => {
-      if (e.target.id) {
-        handleToolbarAction(e.target.id);
+      if (e.target.dataset.action) {
+        handleToolbarAction(e.target.dataset.action);
       }
     });
   }
@@ -74,31 +74,31 @@ function handleFileUpload(e) {
 
 function handleToolbarAction(action) {
   switch (action) {
-    case "upload-btn":
+    case "upload":
       triggerFileInput();
       break;
-    case "save-btn":
+    case "save":
       savePDF();
       break;
-    case "text-btn":
+    case "text":
       createTextBoxAt(lastClick.x, lastClick.y);
       break;
-    case "sign-btn":
+    case "sign":
       openSignatureModal();
       break;
-    case "undo-btn":
+    case "undo":
       undo();
       break;
-    case "redo-btn":
+    case "redo":
       redo();
       break;
-    case "zoom-in-btn":
+    case "zoom-in":
       zoomIn();
       break;
-    case "zoom-out-btn":
+    case "zoom-out":
       zoomOut();
       break;
-    case "help-btn":
+    case "help":
       document.getElementById('help-modal').style.display = 'flex';
       break;
   }
