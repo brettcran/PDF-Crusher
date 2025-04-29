@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PDF Crusher - Editor</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,6 +16,14 @@
   <button class="toolbar-btn" data-action="zoom-in">➕</button>
   <button class="toolbar-btn" data-action="zoom-out">➖</button>
   <button class="toolbar-btn" id="help-btn" data-action="help">❓</button>
+</div>
+
+<!-- Mini Text Toolbar -->
+<div id="mini-text-toolbar" style="display:none;">
+  <select id="font-select"></select>
+  <select id="font-size-select"></select>
+  <input type="color" id="color-picker" value="#111827">
+  <button id="bold-toggle">B</button>
 </div>
 
 <!-- PDF Display -->
@@ -47,6 +55,8 @@
       <button onclick="clearSignature()">Clear</button>
       <button onclick="saveSignature()">Save</button>
     </div>
+    <h3>Saved Signatures</h3>
+    <div id="saved-signatures" style="margin-top: 10px;"></div>
   </div>
 </div>
 
