@@ -1,93 +1,76 @@
-// scripts/pdfHandler.js
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+// === pdfHandler.js ===
 
 let pdfDoc = null;
-let currentPage = 1;
-let scale = 1.0;
-const container = document.getElementById('pdf-container');
-const pageCanvases = [];
+let currentScale = 1.0;
 
-const pdfData = sessionStorage.getItem('pdfData');
-const pdfName = sessionStorage.getItem('pdfName') || 'document.pdf';
-
-if (pdfData) {
-  loadPDF();
+// Load PDF
+async function loadPDF(dataUrl) {
+  const loadingTask = pdfjsLib.getDocument({ data: atob(dataUrl.split(',')[1]) });
+  pdfDoc = await loadingTask.promise;
+  renderAllPages();
 }
 
-function loadPDF() {
-  const loadingTask = pdfjsLib.getDocument({ data: atob(pdfData.split(',')[1]) });
-  loadingTask.promise.then(function (pdf) {
-    pdfDoc = pdf;
-    renderAllPages();
-  });
-}
-
-function renderAllPages() {
-  container.innerHTML = '';
-  pageCanvases.length = 0;
+async function renderAllPages() {
+  pdfContainer.innerHTML = ''; // Clear previous
+  const userLayer = document.createElement('div');
+  userLayer.id = 'user-layer';
+  userLayer.style.position = 'absolute';
+  userLayer.style.top = '0';
+  userLayer.style.left = '0';
+  userLayer.style.right = '0';
+  userLayer.style.bottom = '0';
+  userLayer.style.pointerEvents = 'none';
+  pdfContainer.appendChild(userLayer);
 
   for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    pdfDoc.getPage(pageNum).then(function (page) {
-      const viewport = page.getViewport({ scale: 1.5 });
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: currentScale });
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      canvas.style.display = 'block';
-      canvas.style.margin = '20px auto';
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pdf-page';
+    const context = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
 
-      container.appendChild(canvas);
-      pageCanvases.push(canvas);
+    const renderContext = { canvasContext: context, viewport };
+    await page.render(renderContext).promise;
 
-      const renderContext = {
-        canvasContext: ctx,
-        viewport: viewport
-      };
-      page.render(renderContext);
-    });
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+    wrapper.style.margin = '20px auto';
+    wrapper.appendChild(canvas);
+
+    pdfContainer.appendChild(wrapper);
   }
 }
 
-function savePDF() {
-  const pdf = new jspdf.jsPDF('p', 'px', 'a4');
-  
-  pageCanvases.forEach((canvas, index) => {
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+// Save PDF
+async function savePDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit: 'px', format: 'a4' });
+
+  const pages = pdfContainer.querySelectorAll('.pdf-page');
+
+  for (let i = 0; i < pages.length; i++) {
+    const canvas = pages[i];
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+    if (i !== 0) pdf.addPage();
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const canvasAspect = canvas.width / canvas.height;
-    const pageAspect = pageWidth / pageHeight;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+  }
 
-    let renderWidth, renderHeight;
-
-    if (canvasAspect > pageAspect) {
-      renderWidth = pageWidth;
-      renderHeight = pageWidth / canvasAspect;
-    } else {
-      renderHeight = pageHeight;
-      renderWidth = pageHeight * canvasAspect;
-    }
-
-    pdf.addImage(imgData, 'JPEG', (pageWidth - renderWidth) / 2, (pageHeight - renderHeight) / 2, renderWidth, renderHeight);
-
-    if (index < pageCanvases.length - 1) {
-      pdf.addPage();
-    }
-  });
-
-  pdf.save(pdfName);
+  pdf.save('document.pdf');
 }
 
+// Zoom Functions
 function zoomIn() {
-  scale += 0.2;
+  currentScale += 0.1;
   renderAllPages();
 }
 
 function zoomOut() {
-  if (scale > 0.4) {
-    scale -= 0.2;
-    renderAllPages();
-  }
+  currentScale = Math.max(currentScale - 0.1, 0.5);
+  renderAllPages();
 }
