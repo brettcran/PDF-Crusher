@@ -1,104 +1,123 @@
-// scripts/app.js
+// === app.js ===
 
-let lastClick = { x: 100, y: 100 };
+// Initialize pdf.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const fileInput = document.getElementById('file-input') || document.getElementById('upload-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const closeHelp = document.getElementById('close-help');
-  const closeSignature = document.getElementById('close-signature');
-  const toolbar = document.getElementById('toolbar');
-  const pdfContainer = document.getElementById('pdf-container');
+// DOM Elements
+const uploadBtn = document.getElementById('upload-btn');
+const helpBtn = document.getElementById('help-btn');
+const closeHelp = document.getElementById('close-help');
+const pdfContainer = document.getElementById('pdf-container');
+const toolbar = document.getElementById('toolbar');
+const miniTextToolbar = document.getElementById('mini-text-toolbar');
+const fontSelect = document.getElementById('font-select');
+const fontSizeSelect = document.getElementById('font-size-select');
+const colorPicker = document.getElementById('color-picker');
+const boldToggle = document.getElementById('bold-toggle');
 
-  if (fileInput && fileInput.tagName === "INPUT") {
-    fileInput.addEventListener('change', handleFileUpload);
-  } else if (fileInput && fileInput.tagName === "BUTTON") {
-    fileInput.addEventListener('click', triggerFileInput);
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+  if (uploadBtn) {
+    uploadBtn.addEventListener('click', triggerFileSelect);
+    setupLanding();
   }
-
-  if (helpBtn) {
-    helpBtn.addEventListener('click', () => {
-      document.getElementById('help-modal').style.display = 'flex';
-    });
-  }
-
-  if (closeHelp) {
-    closeHelp.addEventListener('click', () => {
-      document.getElementById('help-modal').style.display = 'none';
-    });
-  }
-
-  if (closeSignature) {
-    closeSignature.addEventListener('click', () => {
-      document.getElementById('signature-modal').style.display = 'none';
-    });
-  }
-
   if (toolbar) {
-    toolbar.addEventListener('click', (e) => {
-      if (e.target.dataset.action) {
-        handleToolbarAction(e.target.dataset.action);
-      }
-    });
-  }
-
-  if (pdfContainer) {
-    pdfContainer.addEventListener('click', (e) => {
-      lastClick = { x: e.offsetX, y: e.offsetY };
-    });
+    setupEditor();
   }
 });
 
-function triggerFileInput() {
-  const hiddenInput = document.createElement('input');
-  hiddenInput.type = 'file';
-  hiddenInput.accept = 'application/pdf';
-  hiddenInput.style.display = 'none';
-  hiddenInput.addEventListener('change', handleFileUpload);
-  document.body.appendChild(hiddenInput);
-  hiddenInput.click();
+// === Landing Page Functions ===
+function setupLanding() {
+  loadRecentFiles();
+  document.getElementById('help-btn').addEventListener('click', () => {
+    document.getElementById('help-modal').style.display = 'flex';
+  });
+  document.getElementById('close-help').addEventListener('click', () => {
+    document.getElementById('help-modal').style.display = 'none';
+  });
 }
 
-function handleFileUpload(e) {
-  const file = e.target.files[0];
-  if (file && file.type === 'application/pdf') {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      sessionStorage.setItem('pdfData', event.target.result);
-      sessionStorage.setItem('pdfName', file.name);
+function triggerFileSelect() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/pdf';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        sessionStorage.setItem('uploadedPDF', event.target.result);
+        saveRecentFile(file.name, event.target.result);
+        window.location.href = 'editor.html';
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+function loadRecentFiles() {
+  const recent = JSON.parse(localStorage.getItem('recentFiles')) || [];
+  const container = document.getElementById('recent-files');
+  container.innerHTML = '';
+  recent.forEach((file, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'upload-btn';
+    btn.textContent = file.name;
+    btn.onclick = () => {
+      sessionStorage.setItem('uploadedPDF', file.data);
       window.location.href = 'editor.html';
     };
-    reader.readAsDataURL(file);
-  }
+    container.appendChild(btn);
+  });
 }
 
-function handleToolbarAction(action) {
-  switch (action) {
-    case "upload":
-      triggerFileInput();
+function saveRecentFile(name, data) {
+  let recent = JSON.parse(localStorage.getItem('recentFiles')) || [];
+  recent.unshift({ name, data });
+  if (recent.length > 5) recent = recent.slice(0, 5);
+  localStorage.setItem('recentFiles', JSON.stringify(recent));
+}
+
+// === Editor Page Functions ===
+function setupEditor() {
+  const savedPDF = sessionStorage.getItem('uploadedPDF');
+  if (savedPDF) {
+    loadPDF(savedPDF);
+  }
+
+  toolbar.addEventListener('click', handleToolbarAction);
+  document.getElementById('help-btn').addEventListener('click', () => {
+    document.getElementById('help-modal').style.display = 'flex';
+  });
+  document.getElementById('close-help').addEventListener('click', () => {
+    document.getElementById('help-modal').style.display = 'none';
+  });
+
+  setupMiniTextToolbar();
+}
+
+function handleToolbarAction(e) {
+  const action = e.target.closest('button')?.dataset?.action;
+  if (!action) return;
+
+  switch(action) {
+    case 'text':
+      createTextBox();
       break;
-    case "save":
-      savePDF();
-      break;
-    case "text":
-      createTextBoxAt(lastClick.x, lastClick.y);
-      break;
-    case "sign":
+    case 'sign':
       openSignatureModal();
       break;
-    case "undo":
-      undo();
+    case 'save':
+      savePDF();
       break;
-    case "redo":
-      redo();
-      break;
-    case "zoom-in":
+    case 'zoom-in':
       zoomIn();
       break;
-    case "zoom-out":
+    case 'zoom-out':
       zoomOut();
       break;
-    case "help":
+    case 'help':
       document.getElementById('help-modal').style.display = 'flex';
       break;
   }
