@@ -19,7 +19,7 @@ body {
 }
 
 /* === Upload and Toolbar Buttons === */
-.upload-btn, .toolbar-btn {
+.upload-btn {
   display: inline-block;
   padding: 12px 24px;
   font-size: 18px;
@@ -28,43 +28,42 @@ body {
   background: linear-gradient(145deg, #6366f1, #4f46e5);
   color: white;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
-.upload-btn:hover, .toolbar-btn:hover {
+.upload-btn:hover {
   background: linear-gradient(145deg, #4f46e5, #6366f1);
   transform: translateY(-2px) scale(1.03);
+}
+
+.toolbar-btn {
+  padding: 10px;
+  font-size: 20px;
+  background: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toolbar-btn:hover {
+  background: #e0e7ff;
 }
 
 /* === Toolbar === */
 #toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 16px;
+  gap: 8px;
+  padding: 10px;
   background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  border-radius: 0 0 16px 16px;
-}
-
-/* === Help Button === */
-.help-btn {
-  margin-top: 30px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: #4f46e5;
-  cursor: pointer;
-}
-
-.help-btn:hover {
-  text-decoration: underline;
 }
 
 /* === PDF Container === */
@@ -87,7 +86,7 @@ canvas {
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
 }
 
-/* === Text Box (added text) === */
+/* === Text Box === */
 .text-box {
   position: absolute;
   background: transparent;
@@ -105,7 +104,7 @@ canvas {
 
 .text-box[contenteditable="true"]:focus {
   outline: none;
-  border: 1px dashed #6366f1;
+  border: 1px solid #4f46e5;
 }
 
 /* === Signature Image === */
@@ -150,7 +149,7 @@ canvas {
   color: #000;
 }
 
-/* === Help List inside Modal === */
+/* === Help List === */
 .help-list {
   list-style: none;
   padding: 0;
@@ -168,7 +167,7 @@ canvas {
   justify-content: center;
 }
 
-/* === Signature Modal === */
+/* === Signature Modal Extras === */
 #signature-pad {
   border-radius: 8px;
 }
@@ -177,6 +176,20 @@ canvas {
   margin-top: 10px;
   display: flex;
   justify-content: space-around;
+}
+
+/* === Mini Text Toolbar === */
+#mini-text-toolbar {
+  position: absolute;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  padding: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 20000;
 }
 
 /* === Mobile Responsive === */
