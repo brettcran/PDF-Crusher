@@ -1,93 +1,87 @@
-// scripts/pdfHandler.js
+// scripts/uiHandler.js
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+function createTextBoxAt(x, y) {
+  const textBox = document.createElement('div');
+  textBox.className = 'text-box';
+  textBox.contentEditable = true;
+  textBox.style.position = 'absolute';
+  textBox.style.left = `${x - 50}px`;
+  textBox.style.top = `${y - 15}px`;
+  textBox.style.minWidth = '100px';
+  textBox.style.minHeight = '30px';
+  textBox.style.padding = '6px 10px';
+  textBox.style.border = '1px dashed #6366f1';
+  textBox.style.borderRadius = '8px';
+  textBox.style.background = 'transparent';
+  textBox.style.color = '#111827';
+  textBox.style.fontSize = '16px';
+  textBox.style.cursor = 'move';
+  textBox.draggable = true;
+  textBox.style.zIndex = '10';
 
-let pdfDoc = null;
-let currentPage = 1;
-let scale = 1.0;
-const container = document.getElementById('pdf-container');
-const pageCanvases = [];
+  document.getElementById('pdf-container').appendChild(textBox);
 
-const pdfData = sessionStorage.getItem('pdfData');
-const pdfName = sessionStorage.getItem('pdfName') || 'document.pdf';
+  enableDrag(textBox);
 
-if (pdfData) {
-  loadPDF();
-}
-
-function loadPDF() {
-  const loadingTask = pdfjsLib.getDocument({ data: atob(pdfData.split(',')[1]) });
-  loadingTask.promise.then(function (pdf) {
-    pdfDoc = pdf;
-    renderAllPages();
+  textBox.addEventListener('focusout', () => {
+    textBox.style.border = 'none';
   });
+
+  textBox.addEventListener('focus', () => {
+    textBox.style.border = '1px dashed #6366f1';
+  });
+
+  textBox.focus();
 }
 
-function renderAllPages() {
-  container.innerHTML = '';
-  pageCanvases.length = 0;
+function enableDrag(element) {
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
 
-  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    pdfDoc.getPage(pageNum).then(function (page) {
-      const viewport = page.getViewport({ scale: 1.5 });
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+  element.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    offsetX = e.clientX - element.offsetLeft;
+    offsetY = e.clientY - element.offsetTop;
+    e.preventDefault();
+  });
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      canvas.style.display = 'block';
-      canvas.style.margin = '20px auto';
-
-      container.appendChild(canvas);
-      pageCanvases.push(canvas);
-
-      const renderContext = {
-        canvasContext: ctx,
-        viewport: viewport
-      };
-      page.render(renderContext);
-    });
-  }
-}
-
-function savePDF() {
-  const pdf = new jspdf.jsPDF('p', 'px', 'a4');
-  
-  pageCanvases.forEach((canvas, index) => {
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const canvasAspect = canvas.width / canvas.height;
-    const pageAspect = pageWidth / pageHeight;
-
-    let renderWidth, renderHeight;
-
-    if (canvasAspect > pageAspect) {
-      renderWidth = pageWidth;
-      renderHeight = pageWidth / canvasAspect;
-    } else {
-      renderHeight = pageHeight;
-      renderWidth = pageHeight * canvasAspect;
-    }
-
-    pdf.addImage(imgData, 'JPEG', (pageWidth - renderWidth) / 2, (pageHeight - renderHeight) / 2, renderWidth, renderHeight);
-
-    if (index < pageCanvases.length - 1) {
-      pdf.addPage();
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      element.style.left = `${e.clientX - offsetX}px`;
+      element.style.top = `${e.clientY - offsetY}px`;
     }
   });
 
-  pdf.save(pdfName);
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  // Mobile touch support
+  element.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    const touch = e.touches[0];
+    offsetX = touch.clientX - element.offsetLeft;
+    offsetY = touch.clientY - element.offsetTop;
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (isDragging) {
+      const touch = e.touches[0];
+      element.style.left = `${touch.clientX - offsetX}px`;
+      element.style.top = `${touch.clientY - offsetY}px`;
+    }
+  });
+
+  document.addEventListener('touchend', () => {
+    isDragging = false;
+  });
 }
 
-function zoomIn() {
-  scale += 0.2;
-  renderAllPages();
+function undo() {
+  alert('Undo not implemented yet.');
 }
 
-function zoomOut() {
-  if (scale > 0.4) {
-    scale -= 0.2;
-    renderAllPages();
-  }
+function redo() {
+  alert('Redo not implemented yet.');
 }
